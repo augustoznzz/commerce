@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 23 23 23;
+    --foreground: 245 245 245;
+    --muted: 163 163 163;
+    --accent: 34 211 238;
+    --border: 38 38 38;
+    --border-hover: 64 64 64;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Focus styles for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-background;
+  }
+
+  /* Skip link for accessibility */
+  .skip-link {
+    @apply absolute -top-10 left-6 z-50 bg-accent text-background px-4 py-2 rounded-md transition-all duration-200;
+  }
+
+  .skip-link:focus {
+    @apply top-6;
+  }
+}
+
+@layer components {
+  .container {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply bg-accent text-background hover:bg-accent/90 focus:bg-accent/90 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:scale-105 focus:scale-105;
+  }
+
+  .btn-secondary {
+    @apply border border-border text-foreground hover:border-border-hover hover:bg-border/10 focus:border-border-hover focus:bg-border/10 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:scale-105 focus:scale-105;
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-accent/10;
+  }
+
+  /* Typography */
+  .heading-xl {
+    @apply text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight;
+  }
+
+  .heading-lg {
+    @apply text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight;
+  }
+
+  .heading-md {
+    @apply text-2xl sm:text-3xl font-semibold tracking-tight;
+  }
+
+  .heading-sm {
+    @apply text-xl sm:text-2xl font-semibold tracking-tight;
+  }
+
+  .text-body {
+    @apply text-base sm:text-lg text-muted leading-relaxed;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
