@@ -2,10 +2,17 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { SiteHeader } from '@/components/site-header'
-import { SiteFooter } from '@/components/site-footer'
 import { AccessibilityProvider } from '@/components/accessibility-provider'
+import { PerformanceMonitor } from '@/components/performance-monitor'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'arial'],
+  variable: '--font-inter',
+  weight: ['400', '500', '600', '700'],
+})
 
 export const metadata: Metadata = {
   title: 'CastleTech Commerce - Premium E-commerce Experience',
@@ -71,14 +78,14 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${inter.className} bg-background text-foreground antialiased`}>
+      <body className={`${inter.variable} font-sans bg-background text-foreground antialiased`}>
         <AccessibilityProvider>
+          <PerformanceMonitor />
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
             <main className="flex-1">
               {children}
             </main>
-            <SiteFooter />
           </div>
         </AccessibilityProvider>
       </body>
