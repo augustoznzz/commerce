@@ -15,8 +15,8 @@ export function Hero() {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="heading-xl text-balance">
-                Premium Products for
-                <span className="text-accent"> Modern Life</span>
+                The best licenses for
+                <span className="text-accent"> all software</span>
               </h1>
               <p className="text-body max-w-lg">
                 Discover exceptional quality and design with our curated collection of 

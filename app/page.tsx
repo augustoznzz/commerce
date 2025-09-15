@@ -3,7 +3,6 @@ import { Hero } from '@/components/hero'
 import { ProductGrid } from '@/components/product-grid'
 import { FeaturesSection } from '@/components/features-section'
 import { TestimonialCarousel } from '@/components/testimonial-carousel'
-import { NewsletterForm } from '@/components/newsletter-form'
 
 // Loading components for better UX
 function ProductGridSkeleton() {
@@ -54,7 +53,6 @@ export default function HomePage() {
       <Suspense fallback={<TestimonialSkeleton />}>
         <TestimonialCarousel />
       </Suspense>
-      <NewsletterForm />
     </div>
   )
 }

@@ -8,31 +8,25 @@ import Image from 'next/image'
 
 export function TestimonialCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
   useEffect(() => {
-    if (!isAutoPlaying) return
-
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % TESTIMONIALS.length)
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [isAutoPlaying])
+  }, [])
 
   const goToPrevious = () => {
     setCurrentIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)
-    setIsAutoPlaying(false)
   }
 
   const goToNext = () => {
     setCurrentIndex((prev) => (prev + 1) % TESTIMONIALS.length)
-    setIsAutoPlaying(false)
   }
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index)
-    setIsAutoPlaying(false)
   }
 
   return (
@@ -150,15 +144,6 @@ export function TestimonialCarousel() {
             </button>
           </div>
 
-          {/* Auto-play indicator */}
-          <div className="text-center mt-6">
-            <button
-              onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-              className="text-sm text-muted hover:text-foreground transition-colors duration-200"
-            >
-              {isAutoPlaying ? 'Pause' : 'Resume'} auto-play
-            </button>
-          </div>
         </motion.div>
       </div>
     </section>

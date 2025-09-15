@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Product } from '@/lib/mock-data'
 import { formatPrice } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { Star, Users, Tag } from 'lucide-react'
 
 interface ProductCardProps {
   product: Product
@@ -57,12 +58,56 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
           {/* Product Info */}
           <div className="p-6">
-            <h3 className="font-semibold text-foreground group-hover:text-accent transition-colors duration-200 mb-2">
+            {/* Category */}
+            {product.category && (
+              <div className="flex items-center gap-1 mb-2">
+                <Tag className="h-3 w-3 text-muted" />
+                <span className="text-xs text-muted">{product.category}</span>
+              </div>
+            )}
+            
+            <h3 className="font-semibold text-foreground group-hover:text-accent transition-colors duration-200 mb-2 line-clamp-2">
               {product.title}
             </h3>
-            <p className="text-xl font-bold text-accent">
-              {formatPrice(product.price)}
-            </p>
+            
+            {/* Description */}
+            {product.description && (
+              <p className="text-sm text-muted mb-3 line-clamp-2">
+                {product.description}
+              </p>
+            )}
+            
+            {/* Rating */}
+            {product.rating && (
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={cn(
+                        "h-4 w-4",
+                        i < Math.floor(product.rating!) ? "text-yellow-400 fill-current" : "text-gray-300"
+                      )}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-muted">
+                  {product.rating} ({product.reviews?.toLocaleString()} reviews)
+                </span>
+              </div>
+            )}
+            
+            {/* Price */}
+            <div className="flex items-center gap-2">
+              <p className="text-xl font-bold text-accent">
+                {formatPrice(product.price)}
+              </p>
+              {product.originalPrice && (
+                <p className="text-sm text-muted line-through">
+                  {formatPrice(product.originalPrice)}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </Link>

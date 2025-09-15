@@ -76,7 +76,7 @@ export function SiteHeader() {
                           >
                             <div className="mb-2 text-lg font-medium">CastleTech</div>
                             <p className="text-muted text-sm leading-tight">
-                              Premium products for modern life. Exceptional quality and design.
+                            The best licenses for all software.
                             </p>
                           </Link>
                         </NavigationMenuLink>
