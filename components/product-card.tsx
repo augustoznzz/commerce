@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Product } from '@/lib/mock-data'
@@ -14,6 +15,21 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
+  const [stockCount, setStockCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('ct_products')
+      if (saved) {
+        const list = JSON.parse(saved) as Product[]
+        const found = list.find(p => p.id === product.id || p.href === product.href)
+        if (found) {
+          const count = found.stockMode === 'keys' ? (found.stockKeys?.length || 0) : (found.stockCount ?? 0)
+          setStockCount(count)
+        }
+      }
+    } catch (_) {}
+  }, [product])
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -75,10 +91,17 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           {/* Product Info */}
           <div className="p-6">
             {/* Category */}
-            {product.category && (
-              <div className="flex items-center gap-1 mb-2">
-                <Tag className="h-3 w-3 text-muted" />
-                <span className="text-xs text-muted">{product.category}</span>
+            {(product.category || stockCount !== null) && (
+              <div className="flex items-center gap-2 mb-2">
+                {product.category && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs text-muted">
+                    <Tag className="h-3 w-3 text-muted" />
+                    {product.category}
+                  </span>
+                )}
+                {stockCount !== null && (
+                  <span className="inline-flex items-center rounded-full bg-border/20 px-2 py-0.5 text-xs text-muted">Stock {stockCount}</span>
+                )}
               </div>
             )}
             

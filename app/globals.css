@@ -22,6 +22,11 @@
     zoom: 0.9;
   }
 
+  /* Soft anchor offset so smooth scrolling stops below the sticky header */
+  :target {
+    scroll-margin-top: 6rem;
+  }
+
   /* Firefox and browsers that don't support `zoom` */
   @supports not (zoom: 1) {
     /* Scale the entire layout down and compensate dimensions to prevent scrollbars */

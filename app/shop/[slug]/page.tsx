@@ -12,10 +12,11 @@ export default function ProductDetailPage() {
   const router = useRouter()
   const slug = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug
 
-  const product: Product | undefined = useMemo(
+  const initialProduct: Product | undefined = useMemo(
     () => PRODUCTS.find((p) => p.href.split('/').pop() === slug),
     [slug]
   )
+  const [product, setProduct] = useState<Product | undefined>(initialProduct)
 
   const [quantity, setQuantity] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
@@ -34,6 +35,18 @@ export default function ProductDetailPage() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [product])
+
+  // Load admin-edited product from localStorage so stock/description stay in sync
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('ct_products')
+      if (saved) {
+        const list: Product[] = JSON.parse(saved)
+        const p = list.find((x) => x.href.split('/').pop() === slug)
+        if (p) setProduct(p)
+      }
+    } catch (_) {}
+  }, [slug])
 
   useEffect(() => {
     // Initialize default model selection
@@ -133,9 +146,20 @@ export default function ProductDetailPage() {
 
             {/* Inventory */}
             <div className="mb-4 text-sm">
-              {product.inventory === 'in_stock' && <span className="text-green-400">In stock</span>}
-              {product.inventory === 'low_stock' && <span className="text-yellow-400">Low stock</span>}
-              {product.inventory === 'out_of_stock' && <span className="text-red-400">Out of stock</span>}
+              {(() => {
+                const count = product.stockMode === 'keys'
+                  ? (product.stockKeys?.length ?? 0)
+                  : (product.stockCount ?? 0)
+                const status: 'out' | 'low' | 'in' = count === 0 ? 'out' : count <= 5 ? 'low' : 'in'
+                return (
+                  <>
+                    {status === 'in' && <span className="text-green-400">In stock</span>}
+                    {status === 'low' && <span className="text-yellow-400">Low stock</span>}
+                    {status === 'out' && <span className="text-red-400">Out of stock</span>}
+                    <span className="ml-2 inline-flex items-center rounded-full bg-border/20 px-2.5 py-0.5 text-[14px] text-muted">Stock {count}</span>
+                  </>
+                )
+              })()}
             </div>
 
             {/* Variants */}

@@ -102,12 +102,12 @@ export default function AdminPage() {
     setProducts(products.map(p => (p.id === id ? { ...p, stockCount: Math.max(0, Math.floor(count)), stockMode: 'count' } : p)))
   }
 
-  const addKeysFromText = (id: string, text: string) => {
+  const setKeysFromText = (id: string, text: string) => {
     const keys = text
       .split(/\r?\n/)
       .map(k => k.trim())
       .filter(Boolean)
-    setProducts(products.map(p => (p.id === id ? { ...p, stockMode: 'keys', stockKeys: [...(p.stockKeys || []), ...keys] } : p)))
+    setProducts(products.map(p => (p.id === id ? { ...p, stockMode: 'keys', stockKeys: keys } : p)))
   }
 
   const addKeysFromFiles = async (id: string, files: FileList | null) => {
@@ -117,7 +117,32 @@ export default function AdminPage() {
       const text = await file.text()
       contents.push(text)
     }
-    addKeysFromText(id, contents.join('\n'))
+    const newKeys = contents
+      .join('\n')
+      .split(/\r?\n/)
+      .map(k => k.trim())
+      .filter(Boolean)
+    setProducts(products.map(p => (p.id === id ? { ...p, stockMode: 'keys', stockKeys: [...(p.stockKeys || []), ...newKeys] } : p)))
+  }
+
+  const updateImageUrl = (id: string, url: string) => {
+    setProducts(products.map(p => (p.id === id ? { ...p, image: url || '/images/key.png' } : p)))
+  }
+
+  const updateImageFromFile = (id: string, fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return
+    const file = fileList[0]
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = String(reader.result || '')
+      // Update state and persist immediately so the product and cards reflect the change
+      setProducts(prev => {
+        const next = prev.map(p => (p.id === id ? { ...p, image: dataUrl } : p))
+        try { localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(next)) } catch (_) {}
+        return next
+      })
+    }
+    reader.readAsDataURL(file)
   }
 
   if (!user) {
@@ -157,8 +182,53 @@ export default function AdminPage() {
         {products.map((p) => (
           <div key={p.id} className="rounded-lg border border-border bg-border/10 p-4">
             <div className="mb-2 text-sm text-muted">ID: {p.id}</div>
-            <div className="mb-1 font-semibold">{p.title}</div>
+            <div className="mb-2">
+              <div className="mb-1 text-sm text-muted">Product name</div>
+              <input
+                type="text"
+                value={p.title}
+                onChange={(e)=>setProducts(products.map(x => x.id === p.id ? { ...x, title: e.target.value } : x))}
+                className="w-full rounded-md bg-border/20 border border-border px-3 py-2 text-sm font-semibold"
+              />
+            </div>
             <div className="mb-3 text-sm text-muted">Current price: {formatPrice(p.price)}</div>
+            {/* Image controls */}
+            <div className="mb-4 flex items-center gap-4">
+              <div className="relative h-16 w-16 overflow-hidden rounded-md border border-border bg-border/20">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.image || '/images/key.png'} alt="preview" className="h-full w-full object-cover" />
+              </div>
+              <div className="flex-1">
+                <div className="mb-1 text-sm text-muted">Image URL</div>
+                <input
+                  type="text"
+                  value={p.image}
+                  onChange={(e)=>updateImageUrl(p.id, e.target.value)}
+                  placeholder="https://... or data:image/..."
+                  className="w-full rounded-md bg-border/20 border border-border px-3 py-2 text-sm"
+                />
+                <div className="mt-2 flex items-center gap-3 text-xs text-muted">
+                  <span>Or upload from device:</span>
+                  <div>
+                    <input id={`upload-${p.id}`} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e)=>updateImageFromFile(p.id, e.target.files)} />
+                    <label htmlFor={`upload-${p.id}`} className="inline-flex cursor-pointer items-center rounded-md border border-border px-3 py-1 text-foreground hover:border-border-hover hover:bg-border/20">
+                      Choose image
+                    </label>
+                  </div>
+                  <button onClick={()=>updateImageUrl(p.id, '/images/key.png')} className="rounded-md border border-border px-2 py-1 text-foreground hover:border-border-hover hover:bg-border/20">Reset</button>
+                </div>
+              </div>
+            </div>
+            <div className="mb-4">
+              <div className="mb-1 text-sm text-muted">Category tag</div>
+              <input
+                type="text"
+                defaultValue={p.category}
+                onBlur={(e)=>setProducts(products.map(x => x.id === p.id ? { ...x, category: e.target.value } : x))}
+                className="w-full rounded-md bg-border/20 border border-border px-3 py-2 text-sm"
+                placeholder="e.g., Design Software"
+              />
+            </div>
             <div className="flex items-center gap-3">
               <input
                 type="number"
@@ -174,31 +244,52 @@ export default function AdminPage() {
                 <div className="mb-1 text-sm text-muted">Stock mode</div>
                 <select
                   value={p.stockMode || 'keys'}
-                  onChange={(e) => updateStockMode(p.id, 'keys')}
+                  onChange={(e) => updateStockMode(p.id, (e.target.value as 'keys' | 'count'))}
                   className="w-56 rounded-md bg-border/20 border border-border px-3 py-2 text-sm select-dark"
                 >
                   <option value="keys">Keys list</option>
+                  <option value="count">Numeric count</option>
                 </select>
-              </div>
-              <div>
-                <div className="mb-1 text-sm text-muted">Add keys (one per line)</div>
-                <textarea
-                  onBlur={(e)=>addKeysFromText(p.id, e.target.value)}
-                  className="h-28 w-full rounded-md bg-border/20 border border-border px-3 py-2 text-sm"
-                  placeholder="KEY-XXXX-YYYY\nKEY-AAAA-BBBB"
-                />
-                <div className="mt-2 text-xs text-muted">Or import files (each line becomes one key):</div>
-                <input
-                  type="file"
-                  multiple
-                  onChange={(e)=>addKeysFromFiles(p.id, e.target.files)}
-                  className="mt-1 w-full text-sm"
-                />
-                <div className="mt-2 text-xs text-muted">Current keys: {(p.stockKeys?.length || 0).toLocaleString()}</div>
-                <div className="mt-2">
-                  <button onClick={saveProductsToStorage} className="btn-secondary">Save product</button>
+                <div className="mt-2 text-xs text-muted">
+                  Current stock: {((p.stockMode === 'keys' ? (p.stockKeys?.length ?? 0) : (p.stockCount ?? 0)) || 0).toLocaleString()}
                 </div>
               </div>
+              { (p.stockMode || 'keys') === 'keys' ? (
+                <div>
+                  <div className="mb-1 text-sm text-muted">Add keys (one per line)</div>
+                  <textarea
+                    onBlur={(e)=>setKeysFromText(p.id, e.target.value)}
+                    className="h-28 w-full rounded-md bg-border/20 border border-border px-3 py-2 text-sm"
+                    placeholder="KEY-XXXX-YYYY\nKEY-AAAA-BBBB"
+                  />
+                  <div className="mt-2 text-xs text-muted">Or import files (each line becomes one key):</div>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={(e)=>addKeysFromFiles(p.id, e.target.files)}
+                    className="mt-1 w-full text-sm"
+                  />
+                  <div className="mt-2 text-xs text-muted">Current keys: {(p.stockKeys?.length ?? 0).toLocaleString()}</div>
+                  <div className="mt-2">
+                    <button onClick={saveProductsToStorage} className="btn-secondary">Save product</button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div className="mb-1 text-sm text-muted">Stock count</div>
+                  <input
+                    type="number"
+                    min={0}
+                    defaultValue={p.stockCount ?? 0}
+                    onBlur={(e)=>updateStockCount(p.id, Number(e.target.value))}
+                    className="w-56 rounded-md bg-border/20 border border-border px-3 py-2 text-sm"
+                    placeholder="0"
+                  />
+                  <div className="mt-2">
+                    <button onClick={saveProductsToStorage} className="btn-secondary">Save product</button>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="mt-4">
               <div className="mb-1 text-sm text-muted">Rich description (HTML allowed)</div>

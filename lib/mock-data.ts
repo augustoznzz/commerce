@@ -23,7 +23,7 @@ export interface Product {
   specs?: Record<string, string>
   highlights?: string[]
   // Stock management
-  stockMode?: 'count' | 'keys'
+  stockMode?: 'infinite' | 'keys'
   stockCount?: number
   stockKeys?: string[]
 }
