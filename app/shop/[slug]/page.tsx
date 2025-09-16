@@ -200,8 +200,33 @@ export default function ProductDetailPage() {
                 onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
                 className="w-20 rounded-md bg-border/20 border border-border px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
-              <button className="btn-primary">Add to cart</button>
-              <button className="btn-secondary">Buy now</button>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  try {
+                    const slugVal = (slug || '').toString()
+                    const raw = localStorage.getItem('ct_cart')
+                    const list: { slug: string; quantity: number }[] = raw ? JSON.parse(raw) : []
+                    const idx = list.findIndex((x) => x.slug === slugVal)
+                    if (idx >= 0) {
+                      list[idx].quantity = Math.max(1, (list[idx].quantity || 1) + quantity)
+                    } else {
+                      list.push({ slug: slugVal, quantity: Math.max(1, quantity) })
+                    }
+                    localStorage.setItem('ct_cart', JSON.stringify(list))
+                    router.push('/cart')
+                  } catch (_) {
+                    router.push('/cart')
+                  }
+                }}
+              >
+                Add to cart
+              </button>
+              <form action="/checkout" method="POST">
+                <input type="hidden" name="slug" value={slug || ''} />
+                <input type="hidden" name="quantity" value={quantity} />
+                <button type="submit" className="btn-secondary">Buy now</button>
+              </form>
             </div>
 
             <p className="mb-8 text-sm text-muted">Free shipping over R$ 200. 30-day returns. Taxes included.</p>

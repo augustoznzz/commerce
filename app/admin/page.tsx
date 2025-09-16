@@ -192,6 +192,18 @@ export default function AdminPage() {
               />
             </div>
             <div className="mb-3 text-sm text-muted">Current price: {formatPrice(p.price)}</div>
+            {/* Stripe mapping */}
+            <div className="mb-4">
+              <div className="mb-1 text-sm text-muted">Stripe product ID</div>
+              <input
+                type="text"
+                value={p.stripeProductId || ''}
+                onChange={(e)=>setProducts(products.map(x => x.id === p.id ? { ...x, stripeProductId: e.target.value } : x))}
+                placeholder="prod_..."
+                className="w-full rounded-md bg-border/20 border border-border px-3 py-2 text-sm"
+              />
+              <div className="mt-1 text-xs text-muted">Example for 'Key': prod_T43A6IQ832zeQD</div>
+            </div>
             {/* Image controls */}
             <div className="mb-4 flex items-center gap-4">
               <div className="relative h-16 w-16 overflow-hidden rounded-md border border-border bg-border/20">

@@ -26,6 +26,8 @@ export interface Product {
   stockMode?: 'infinite' | 'keys'
   stockCount?: number
   stockKeys?: string[]
+  // Payments
+  stripeProductId?: string
 }
 
 export interface Testimonial {
