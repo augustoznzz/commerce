@@ -147,10 +147,13 @@ export default function ProductDetailPage() {
             {/* Inventory */}
             <div className="mb-4 text-sm">
               {(() => {
-                const count = product.stockMode === 'keys'
-                  ? (product.stockKeys?.length ?? 0)
-                  : (product.stockCount ?? 0)
-                const status: 'out' | 'low' | 'in' = count === 0 ? 'out' : count <= 5 ? 'low' : 'in'
+                const isInfinite = product.stockMode === 'infinite'
+                const count = isInfinite
+                  ? '∞'
+                  : (product.stockMode === 'keys' ? (product.stockKeys?.length ?? 0) : (product.stockCount ?? 0))
+                const status: 'out' | 'low' | 'in' = isInfinite
+                  ? 'in'
+                  : (Number(count) === 0 ? 'out' : Number(count) <= 5 ? 'low' : 'in')
                 return (
                   <>
                     {status === 'in' && <span className="text-green-400">In stock</span>}

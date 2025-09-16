@@ -15,7 +15,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
-  const [stockCount, setStockCount] = useState<number | null>(null)
+  const [stock, setStock] = useState<string | null>(null)
 
   useEffect(() => {
     try {
@@ -24,8 +24,8 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         const list = JSON.parse(saved) as Product[]
         const found = list.find(p => p.id === product.id || p.href === product.href)
         if (found) {
-          const count = found.stockMode === 'keys' ? (found.stockKeys?.length || 0) : (found.stockCount ?? 0)
-          setStockCount(count)
+          const val = found.stockMode === 'infinite' ? '∞' : String(found.stockMode === 'keys' ? (found.stockKeys?.length || 0) : (found.stockCount ?? 0))
+          setStock(val)
         }
       }
     } catch (_) {}
@@ -91,7 +91,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           {/* Product Info */}
           <div className="p-6">
             {/* Category */}
-            {(product.category || stockCount !== null) && (
+            {(product.category || stock !== null) && (
               <div className="flex items-center gap-2 mb-2">
                 {product.category && (
                   <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs text-muted">
@@ -99,8 +99,8 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                     {product.category}
                   </span>
                 )}
-                {stockCount !== null && (
-                  <span className="inline-flex items-center rounded-full bg-border/20 px-2 py-0.5 text-xs text-muted">Stock {stockCount}</span>
+                {stock !== null && (
+                  <span className="inline-flex items-center rounded-full bg-border/20 px-2 py-0.5 text-xs text-muted">Stock {stock}</span>
                 )}
               </div>
             )}

@@ -94,12 +94,12 @@ export default function AdminPage() {
     setProducts(products.filter(p => p.id !== id))
   }
 
-  const updateStockMode = (id: string, mode: 'count' | 'keys') => {
+  const updateStockMode = (id: string, mode: 'infinite' | 'keys') => {
     setProducts(products.map(p => (p.id === id ? { ...p, stockMode: mode } : p)))
   }
 
   const updateStockCount = (id: string, count: number) => {
-    setProducts(products.map(p => (p.id === id ? { ...p, stockCount: Math.max(0, Math.floor(count)), stockMode: 'count' } : p)))
+    setProducts(products.map(p => (p.id === id ? { ...p, stockCount: Math.max(0, Math.floor(count)) } : p)))
   }
 
   const setKeysFromText = (id: string, text: string) => {
@@ -244,17 +244,17 @@ export default function AdminPage() {
                 <div className="mb-1 text-sm text-muted">Stock mode</div>
                 <select
                   value={p.stockMode || 'keys'}
-                  onChange={(e) => updateStockMode(p.id, (e.target.value as 'keys' | 'count'))}
+                  onChange={(e) => updateStockMode(p.id, (e.target.value as 'keys' | 'infinite'))}
                   className="w-56 rounded-md bg-border/20 border border-border px-3 py-2 text-sm select-dark"
                 >
                   <option value="keys">Keys list</option>
-                  <option value="count">Numeric count</option>
+                  <option value="infinite">Infinite</option>
                 </select>
                 <div className="mt-2 text-xs text-muted">
-                  Current stock: {((p.stockMode === 'keys' ? (p.stockKeys?.length ?? 0) : (p.stockCount ?? 0)) || 0).toLocaleString()}
+                  Current stock: {p.stockMode === 'infinite' ? '∞' : ((p.stockMode === 'keys' ? (p.stockKeys?.length ?? 0) : (p.stockCount ?? 0)) || 0).toLocaleString()}
                 </div>
               </div>
-              { (p.stockMode || 'keys') === 'keys' ? (
+              { (p.stockMode || 'keys') !== 'infinite' ? (
                 <div>
                   <div className="mb-1 text-sm text-muted">Add keys (one per line)</div>
                   <textarea
@@ -276,15 +276,20 @@ export default function AdminPage() {
                 </div>
               ) : (
                 <div>
-                  <div className="mb-1 text-sm text-muted">Stock count</div>
-                  <input
-                    type="number"
-                    min={0}
-                    defaultValue={p.stockCount ?? 0}
-                    onBlur={(e)=>updateStockCount(p.id, Number(e.target.value))}
-                    className="w-56 rounded-md bg-border/20 border border-border px-3 py-2 text-sm"
-                    placeholder="0"
+                  <div className="mb-1 text-sm text-muted">Infinite mode: add supplemental keys (optional)</div>
+                  <textarea
+                    onBlur={(e)=>setKeysFromText(p.id, e.target.value)}
+                    className="h-28 w-full rounded-md bg-border/20 border border-border px-3 py-2 text-sm"
+                    placeholder="KEY-XXXX-YYYY\nKEY-AAAA-BBBB"
                   />
+                  <div className="mt-2 text-xs text-muted">Or import files (each line becomes one key):</div>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={(e)=>addKeysFromFiles(p.id, e.target.files)}
+                    className="mt-1 w-full text-sm"
+                  />
+                  <div className="mt-2 text-xs text-muted">Stored keys (optional): {(p.stockKeys?.length ?? 0).toLocaleString()}</div>
                   <div className="mt-2">
                     <button onClick={saveProductsToStorage} className="btn-secondary">Save product</button>
                   </div>
