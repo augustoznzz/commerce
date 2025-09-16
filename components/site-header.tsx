@@ -71,12 +71,12 @@ export function SiteHeader() {
                       <li className="row-span-3">
                         <NavigationMenuLink asChild>
                           <Link
-                            className="from-muted/50 to-muted flex h-full w-full flex-col justify-end rounded-md bg-gradient-to-b p-6 no-underline outline-none select-none focus:shadow-md"
+                            className="flex h-full w-full flex-col justify-end rounded-md border border-white/10 bg-blue-900 p-6 no-underline outline-none select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] focus:shadow-md"
                             href="/"
                           >
-                            <div className="mb-2 text-lg font-medium">CastleTech</div>
-                            <p className="text-muted text-sm leading-tight">
-                            The best licenses for all software.
+                            <div className="mb-2 text-lg font-medium text-white">CastleTech</div>
+                            <p className="text-sm leading-tight text-white/75">
+                              The best licenses for all software.
                             </p>
                           </Link>
                         </NavigationMenuLink>
