@@ -4,6 +4,11 @@ import { PRODUCTS, type Product } from '@/lib/mock-data'
 
 export async function POST(req: NextRequest) {
   try {
+    const forwardedProto = req.headers.get('x-forwarded-proto') || 'https'
+    const forwardedHost = req.headers.get('x-forwarded-host') || req.headers.get('host') || ''
+    const origin = (process.env.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.trim().length > 0)
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : `${forwardedProto}://${forwardedHost}`
     const formData = await req.formData()
     const itemsJson = formData.get('items') as string | null
     const slug = String(formData.get('slug') || '')
@@ -49,8 +54,8 @@ export async function POST(req: NextRequest) {
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         line_items,
-        success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/checkout/success`,
-        cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/checkout/cancel`,
+        success_url: `${origin}/checkout/success`,
+        cancel_url: `${origin}/checkout/cancel`,
       })
       return NextResponse.redirect(session.url!, { status: 303 })
     }
@@ -75,8 +80,8 @@ export async function POST(req: NextRequest) {
             quantity,
           },
         ],
-        success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/checkout/success`,
-        cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/checkout/cancel`,
+        success_url: `${origin}/checkout/success`,
+        cancel_url: `${origin}/checkout/cancel`,
       })
       return NextResponse.redirect(session.url!, { status: 303 })
     }
@@ -92,8 +97,8 @@ export async function POST(req: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: [{ price: priceId, quantity }],
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/checkout/success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/checkout/cancel`,
+      success_url: `${origin}/checkout/success`,
+      cancel_url: `${origin}/checkout/cancel`,
     })
 
     return NextResponse.redirect(session.url!, { status: 303 })
