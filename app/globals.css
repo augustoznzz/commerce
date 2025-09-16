@@ -123,6 +123,16 @@
   .text-balance {
     text-wrap: balance;
   }
+  /* Dark select helper */
+  .select-dark,
+  .select-dark option,
+  .select-dark optgroup {
+    background-color: #171717;
+    color: rgb(var(--foreground) / 1);
+  }
+  .select-dark:focus {
+    outline: none;
+  }
 }
 
 /* Reduced motion preferences */

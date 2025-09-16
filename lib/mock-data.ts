@@ -7,9 +7,25 @@ export interface Product {
   badge?: string
   category?: string
   description?: string
+  htmlDescription?: string
   originalPrice?: number
   rating?: number
   reviews?: number
+  inventory?: 'in_stock' | 'low_stock' | 'out_of_stock'
+  discountPercent?: number
+  isNew?: boolean
+  gallery?: string[]
+  variants?: {
+    colors?: string[]
+    sizes?: string[]
+    models?: string[]
+  }
+  specs?: Record<string, string>
+  highlights?: string[]
+  // Stock management
+  stockMode?: 'count' | 'keys'
+  stockCount?: number
+  stockKeys?: string[]
 }
 
 export interface Testimonial {
@@ -39,8 +55,19 @@ export const PRODUCTS: Product[] = [
     badge: 'Sale',
     category: 'Development Tools',
     description: 'Professional code editor with advanced features',
+    htmlDescription: '<p>VS Code Pro delivers a premium editing experience with AI-assisted coding, integrated debugging, and extensible tooling.</p><ul><li>Integrated Git</li><li>Remote dev</li><li>Extensions marketplace</li></ul>',
     rating: 4.8,
     reviews: 1250,
+    inventory: 'in_stock',
+    discountPercent: 40,
+    isNew: false,
+    gallery: [
+      'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=1200&h=1200&fit=crop&crop=center',
+      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=1200&fit=crop&crop=center',
+    ],
+    variants: { colors: ['Dark', 'Light'], sizes: ['Single', 'Team'] },
+    specs: { Platform: 'Windows / macOS / Linux', License: 'Per user', Updates: '1 year' },
+    highlights: ['AI-assisted coding', 'Fast and lightweight', 'Rich ecosystem'],
   },
   {
     id: '2',
@@ -51,8 +78,17 @@ export const PRODUCTS: Product[] = [
     badge: 'Best Seller',
     category: 'Development Tools',
     description: 'Powerful IDE for Java and other languages',
+    htmlDescription: '<p>IntelliJ IDEA maximizes developer productivity with smart code completion and deep framework support.</p>',
     rating: 4.9,
     reviews: 2100,
+    inventory: 'low_stock',
+    isNew: false,
+    gallery: [
+      'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=1200&fit=crop&crop=center',
+    ],
+    variants: { models: ['Model 1', 'Model 2', 'Model 3'] },
+    specs: { Platform: 'Windows / macOS / Linux', License: 'Per user', Support: 'Email' },
+    highlights: ['Smart completion', 'Refactorings', 'Debugger'],
   },
   {
     id: '3',
@@ -62,8 +98,17 @@ export const PRODUCTS: Product[] = [
     href: '/shop/adobe-suite',
     category: 'Design Software',
     description: 'Complete creative toolkit for professionals',
+    htmlDescription: '<p>All the creative tools you need for design, video, and more.</p>',
     rating: 4.7,
     reviews: 3200,
+    inventory: 'in_stock',
+    isNew: false,
+    gallery: [
+      'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=1200&h=1200&fit=crop&crop=center',
+    ],
+    variants: { sizes: ['Individual', 'Team'] },
+    specs: { Apps: '20+', Storage: '100GB cloud', Support: '24/7' },
+    highlights: ['Industry standard', 'Cross-app workflows', 'Cloud libraries'],
   },
   {
     id: '4',

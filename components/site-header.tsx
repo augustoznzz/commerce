@@ -9,12 +9,9 @@ import { NAVIGATION_ITEMS } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 
 export function SiteHeader() {
@@ -58,112 +55,63 @@ export function SiteHeader() {
               <span>CastleTech</span>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation (no submenus) */}
             <NavigationMenu className="hidden md:flex">
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-border/20 text-muted hover:text-foreground">
-                    <Home className="mr-2 h-4 w-4" />
-                    Home
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                      <li className="row-span-3">
-                        <NavigationMenuLink asChild>
-                          <Link
-                            className="flex h-full w-full flex-col justify-end rounded-md border border-white/10 bg-blue-900 p-6 no-underline outline-none select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] focus:shadow-md"
-                            href="/"
-                          >
-                            <div className="mb-2 text-lg font-medium text-white">CastleTech</div>
-                            <p className="text-sm leading-tight text-white/75">
-                              The best licenses for all software.
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <NavigationMenuLink asChild>
-                        <Link href="/" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-border/20 focus:bg-border/20">
-                          <div className="text-sm font-medium leading-none">Overview</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted">
-                            Discover our premium product collection
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link href="/#features" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-border/20 focus:bg-border/20">
-                          <div className="text-sm font-medium leading-none">Features</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted">
-                            Fast delivery, easy returns, secure payment
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link href="/#testimonials" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-border/20 focus:bg-border/20">
-                          <div className="text-sm font-medium leading-none">Testimonials</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted">
-                            What our customers say about us
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </ul>
-                  </NavigationMenuContent>
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href="/"
+                      className={cn(
+                        'inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-[#22D3EE]',
+                        pathname === '/' && 'text-[#22D3EE]'
+                      )}
+                    >
+                      <Home className="mr-2 h-4 w-4" />
+                      Home
+                    </Link>
+                  </NavigationMenuLink>
                 </NavigationMenuItem>
-                
+
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-border/20 text-muted hover:text-foreground">
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    Shop
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-2 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                      <NavigationMenuLink asChild>
-                        <Link href="/shop" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-border/20 focus:bg-border/20">
-                          <div className="text-sm font-medium leading-none">All Products</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted">
-                            Browse our complete collection of premium products
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link href="/shop?filter=new" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-border/20 focus:bg-border/20">
-                          <div className="text-sm font-medium leading-none">New Arrivals</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted">
-                            Latest products added to our collection
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link href="/shop?filter=bestsellers" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-border/20 focus:bg-border/20">
-                          <div className="text-sm font-medium leading-none">Best Sellers</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted">
-                            Our most popular and highly-rated products
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                      <NavigationMenuLink asChild>
-                        <Link href="/shop?filter=sale" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-border/20 focus:bg-border/20">
-                          <div className="text-sm font-medium leading-none">Sale</div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted">
-                            Special offers and discounted items
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </ul>
-                  </NavigationMenuContent>
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href="/shop"
+                      className={cn(
+                        'inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-[#22D3EE]',
+                        pathname?.startsWith('/shop') && 'text-[#22D3EE]'
+                      )}
+                    >
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Shop
+                    </Link>
+                  </NavigationMenuLink>
                 </NavigationMenuItem>
-                
+
                 <NavigationMenuItem>
-                  <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                    <Link href="/about" className="bg-transparent hover:bg-border/20 text-muted hover:text-foreground">
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href="/about"
+                      className={cn(
+                        'inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-[#22D3EE]',
+                        pathname === '/about' && 'text-[#22D3EE]'
+                      )}
+                    >
                       <Info className="mr-2 h-4 w-4" />
                       About
                     </Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
-                
+
                 <NavigationMenuItem>
-                  <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                    <Link href="/contact" className="bg-transparent hover:bg-border/20 text-muted hover:text-foreground">
+                  <NavigationMenuLink asChild>
+                    <Link
+                      href="/contact"
+                      className={cn(
+                        'inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-muted transition-colors hover:text-[#22D3EE]',
+                        pathname === '/contact' && 'text-[#22D3EE]'
+                      )}
+                    >
                       <Mail className="mr-2 h-4 w-4" />
                       Contact
                     </Link>
@@ -176,7 +124,7 @@ export function SiteHeader() {
             <div className="flex items-center space-x-4">
               {/* Sign In */}
               <Link
-                href="/auth/signin"
+                href="/admin"
                 className="hidden sm:flex items-center space-x-2 text-sm font-medium text-muted hover:text-foreground transition-colors duration-200"
               >
                 <User className="h-4 w-4" />
@@ -231,7 +179,7 @@ export function SiteHeader() {
                         className={cn(
                           'text-base font-medium transition-colors duration-200',
                           isActive 
-                            ? 'text-accent' 
+                            ? 'text-[#22D3EE]' 
                             : 'text-muted hover:text-foreground'
                         )}
                       >
@@ -242,7 +190,7 @@ export function SiteHeader() {
                   
                   {/* Mobile Sign In */}
                   <Link
-                    href="/auth/signin"
+                    href="/admin"
                     onClick={closeMobileMenu}
                     className="flex items-center space-x-2 text-base font-medium text-muted hover:text-foreground transition-colors duration-200 pt-4 border-t border-border/40"
                   >

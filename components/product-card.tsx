@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { Product } from '@/lib/mock-data'
 import { formatPrice } from '@/lib/utils'
 import { cn } from '@/lib/utils'
-import { Star, Tag, Heart } from 'lucide-react'
+import { Star, Tag } from 'lucide-react'
 
 interface ProductCardProps {
   product: Product
@@ -37,7 +37,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           {/* Product Image */}
           <div className="relative aspect-square">
             <Image
-              src={product.image}
+              src={product.image || '/images/key.png'}
               alt={product.title}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -66,17 +66,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               </div>
             )}
 
-            {/* Wishlist button */}
-            <button
-              aria-label="Add to wishlist"
-              className="absolute right-3 top-3 z-10 rounded-full bg-background/70 p-2 text-foreground shadow-xl backdrop-blur-md transition-colors hover:text-accent focus:text-accent"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-              }}
-            >
-              <Heart className="h-4 w-4" />
-            </button>
+            
 
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

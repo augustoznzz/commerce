@@ -1,23 +1,32 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { ShoppingBag, Filter, Search, X, ChevronDown } from 'lucide-react'
 import { ProductCard } from '@/components/product-card'
 import { PRODUCTS } from '@/lib/mock-data'
 import { cn } from '@/lib/utils'
 
 export default function ShopPage() {
+  const [allProducts, setAllProducts] = useState(PRODUCTS)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [showFilters, setShowFilters] = useState(false)
   const [sortBy, setSortBy] = useState('name')
 
+  // Load admin-modified products from localStorage if present
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('ct_products')
+      if (saved) setAllProducts(JSON.parse(saved))
+    } catch (_) {}
+  }, [])
+
   // Get unique categories
-  const categories = ['All', ...Array.from(new Set(PRODUCTS.map(p => p.category).filter(Boolean)))]
+  const categories = ['All', ...Array.from(new Set(allProducts.map(p => p.category).filter(Boolean)))]
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    let filtered = PRODUCTS.filter(product => {
+    let filtered = allProducts.filter(product => {
       const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            product.description?.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory
@@ -40,7 +49,7 @@ export default function ShopPage() {
     })
 
     return filtered
-  }, [searchTerm, selectedCategory, sortBy])
+  }, [allProducts, searchTerm, selectedCategory, sortBy])
 
   return (
     <div className="min-h-screen pt-20">
@@ -73,7 +82,7 @@ export default function ShopPage() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="appearance-none bg-border/20 border border-border text-foreground px-4 py-3 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent min-w-[200px]"
+              className="appearance-none bg-border/20 border border-border text-foreground px-4 py-3 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent min-w-[200px] select-dark"
             >
               {categories.map(category => (
                 <option key={category} value={category}>
@@ -89,7 +98,7 @@ export default function ShopPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none bg-border/20 border border-border text-foreground px-4 py-3 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent min-w-[150px]"
+              className="appearance-none bg-border/20 border border-border text-foreground px-4 py-3 rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent min-w-[150px] select-dark"
             >
               <option value="name">Sort by Name</option>
               <option value="price-low">Price: Low to High</option>
@@ -153,7 +162,7 @@ export default function ShopPage() {
         {/* Results Count */}
         <div className="flex items-center justify-between mb-8">
           <p className="text-muted">
-            Showing {filteredProducts.length} of {PRODUCTS.length} products
+            Showing {filteredProducts.length} of {allProducts.length} products
           </p>
           {(searchTerm || selectedCategory !== 'All') && (
             <button
