@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { Product } from '@/lib/mock-data'
 import { formatPrice } from '@/lib/utils'
 import { cn } from '@/lib/utils'
-import { Star, Users, Tag } from 'lucide-react'
+import { Star, Tag } from 'lucide-react'
 
 interface ProductCardProps {
   product: Product
@@ -86,7 +86,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                       key={i}
                       className={cn(
                         "h-4 w-4",
-                        i < Math.floor(product.rating!) ? "text-yellow-400 fill-current" : "text-gray-300"
+                        i < Math.floor(product.rating || 0) ? "text-yellow-400 fill-current" : "text-gray-300"
                       )}
                     />
                   ))}

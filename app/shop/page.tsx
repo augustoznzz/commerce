@@ -6,14 +6,14 @@ import { ProductCard } from '@/components/product-card'
 import { PRODUCTS } from '@/lib/mock-data'
 import { cn } from '@/lib/utils'
 
-// Get unique categories
-const categories = ['All', ...Array.from(new Set(PRODUCTS.map(p => p.category).filter(Boolean)))]
-
 export default function ShopPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [showFilters, setShowFilters] = useState(false)
   const [sortBy, setSortBy] = useState('name')
+
+  // Get unique categories
+  const categories = ['All', ...Array.from(new Set(PRODUCTS.map(p => p.category).filter(Boolean)))]
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
