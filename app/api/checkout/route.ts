@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { PRODUCTS, type Product } from '@/lib/mock-data'
+import { getStripeFromEnv, buildStripeRequestOptions } from '@/lib/stripe'
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,7 +19,8 @@ export async function POST(req: NextRequest) {
 
     const list: Product[] = PRODUCTS
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion: '2023-10-16' })
+    const stripe = getStripeFromEnv()
+    const opts = buildStripeRequestOptions()
 
     if (itemsJson) {
       let cart: { slug: string; quantity: number }[] = []
@@ -30,7 +32,7 @@ export async function POST(req: NextRequest) {
         if (!p) continue
         const stripeProductId = p.stripeProductId || (p.title.toLowerCase().includes('key') ? 'prod_T43A6IQ832zeQD' : undefined)
         if (stripeProductId) {
-          const productObj = await stripe.products.retrieve(stripeProductId)
+          const productObj = await stripe.products.retrieve(stripeProductId, opts)
           const defaultPrice = productObj.default_price
           if (!defaultPrice) continue
           const priceId = typeof defaultPrice === 'string' ? defaultPrice : defaultPrice.id
@@ -56,7 +58,7 @@ export async function POST(req: NextRequest) {
         line_items,
         success_url: `${origin}/checkout/success`,
         cancel_url: `${origin}/checkout/cancel`,
-      })
+      }, opts)
       return NextResponse.redirect(session.url!, { status: 303 })
     }
 
@@ -80,11 +82,11 @@ export async function POST(req: NextRequest) {
         ],
         success_url: `${origin}/checkout/success`,
         cancel_url: `${origin}/checkout/cancel`,
-      })
+      }, opts)
       return NextResponse.redirect(session.url!, { status: 303 })
     }
 
-    const productObj = await stripe.products.retrieve(stripeProductId)
+    const productObj = await stripe.products.retrieve(stripeProductId, opts)
     const defaultPrice = productObj.default_price
     if (!defaultPrice) {
       return NextResponse.json({ error: 'Stripe product missing default price' }, { status: 400 })
@@ -96,7 +98,7 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: priceId, quantity }],
       success_url: `${origin}/checkout/success`,
       cancel_url: `${origin}/checkout/cancel`,
-    })
+    }, opts)
 
     return NextResponse.redirect(session.url!, { status: 303 })
   } catch (err: any) {

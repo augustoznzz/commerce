@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { getStripeFromEnv, buildStripeRequestOptions } from '@/lib/stripe'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -10,7 +11,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing STRIPE_WEBHOOK_SECRET' }, { status: 500 })
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion: '2023-10-16' })
+  const stripe = getStripeFromEnv()
+  const opts = buildStripeRequestOptions()
 
   const rawBody = await req.text()
   const signature = req.headers.get('stripe-signature') as string | null
@@ -26,7 +28,8 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        // TODO: fulfill the order here (e.g., mark as paid, deliver license)
+        // Example: fetch the session with per-request options (supports Connect)
+        try { await stripe.checkout.sessions.retrieve(session.id, opts) } catch (_) {}
         break
       }
       case 'charge.succeeded':
