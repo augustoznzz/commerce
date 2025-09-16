@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { Product } from '@/lib/mock-data'
 import { formatPrice } from '@/lib/utils'
 import { cn } from '@/lib/utils'
-import { Star, Tag } from 'lucide-react'
+import { Star, Tag, Heart } from 'lucide-react'
 
 interface ProductCardProps {
   product: Product
@@ -28,6 +28,12 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         aria-label={`View ${product.title} product details`}
       >
         <div className="relative overflow-hidden rounded-xl bg-border/20 card-hover">
+          {/* Glow backdrop */}
+          <div className="pointer-events-none absolute -inset-1 rounded-2xl bg-accent/20 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
+          {/* Gradient frame */}
+          <div className="pointer-events-none absolute inset-0 rounded-xl p-[1px]">
+            <div className="h-full w-full rounded-[11px] bg-gradient-to-br from-accent/40 via-white/10 to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-100" />
+          </div>
           {/* Product Image */}
           <div className="relative aspect-square">
             <Image
@@ -36,6 +42,14 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+            {/* Shine sweep */}
+            <motion.span
+              aria-hidden
+              initial={{ x: '-120%' }}
+              whileHover={{ x: '120%' }}
+              transition={{ duration: 1.2, ease: 'easeOut' }}
+              className="pointer-events-none absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"
             />
             
             {/* Badge */}
@@ -51,6 +65,18 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                 </span>
               </div>
             )}
+
+            {/* Wishlist button */}
+            <button
+              aria-label="Add to wishlist"
+              className="absolute right-3 top-3 z-10 rounded-full bg-background/70 p-2 text-foreground shadow-xl backdrop-blur-md transition-colors hover:text-accent focus:text-accent"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
+            >
+              <Heart className="h-4 w-4" />
+            </button>
 
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -107,6 +133,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                   {formatPrice(product.originalPrice)}
                 </p>
               )}
+            </div>
+            {/* Quick action */}
+            <div className="mt-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <span className="inline-flex items-center justify-center rounded-lg border border-border bg-background/60 px-4 py-2 text-sm text-foreground shadow-sm backdrop-blur-md transition-colors hover:border-border-hover hover:bg-border/20">Quick view</span>
             </div>
           </div>
         </div>

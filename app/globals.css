@@ -22,6 +22,17 @@
     zoom: 0.9;
   }
 
+  /* Firefox and browsers that don't support `zoom` */
+  @supports not (zoom: 1) {
+    /* Scale the entire layout down and compensate dimensions to prevent scrollbars */
+    body {
+      transform: scale(0.9);
+      transform-origin: top left;
+      width: 111.1111%;
+      height: 111.1111%;
+    }
+  }
+
   body {
     @apply bg-background text-foreground;
   }
