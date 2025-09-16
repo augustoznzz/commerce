@@ -4,6 +4,8 @@ import { PRODUCTS, type Product } from '@/lib/mock-data'
 
 export async function POST(req: NextRequest) {
   try {
+    // Ensure Node runtime for Stripe SDK on Netlify
+    ;(globalThis as any).EDGE_RUNTIME = undefined
     const forwardedProto = req.headers.get('x-forwarded-proto') || 'https'
     const forwardedHost = req.headers.get('x-forwarded-host') || req.headers.get('host') || ''
     const origin = (process.env.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.trim().length > 0)
