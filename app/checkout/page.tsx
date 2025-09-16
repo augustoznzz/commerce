@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -8,7 +8,9 @@ import { PRODUCTS, type Product } from '@/lib/mock-data'
 import { formatPrice } from '@/lib/utils'
 import { ChevronLeft } from 'lucide-react'
 
-export default function CheckoutPage() {
+export const dynamic = 'force-dynamic'
+
+function CheckoutContent() {
   const router = useRouter()
   const search = useSearchParams()
   const slugFromUrl = search.get('slug') || ''
@@ -110,6 +112,14 @@ export default function CheckoutPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="container pt-24 pb-24">Loading...</div>}>
+      <CheckoutContent />
+    </Suspense>
   )
 }
 

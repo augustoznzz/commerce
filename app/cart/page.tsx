@@ -132,7 +132,7 @@ export default function CartPage() {
                   <span>{formatPrice(subtotal)}</span>
                 </div>
 
-                <form action="/checkout" method="POST" className="space-y-2">
+                <form action="/api/checkout" method="POST" className="space-y-2">
                   <input type="hidden" name="items" value={JSON.stringify(cart)} />
                   <button type="submit" className="btn-primary w-full">Checkout</button>
                 </form>

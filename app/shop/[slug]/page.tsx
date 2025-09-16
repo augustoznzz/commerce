@@ -228,7 +228,7 @@ export default function ProductDetailPage() {
               >
                 Add to cart
               </button>
-              <form action="/checkout" method="POST">
+              <form action="/api/checkout" method="POST">
                 <input type="hidden" name="slug" value={slug || ''} />
                 <input type="hidden" name="quantity" value={quantity} />
                 <button type="submit" className="btn-secondary">Buy now</button>
