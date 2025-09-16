@@ -17,6 +17,7 @@ import {
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [cartCount, setCartCount] = useState(0)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -26,6 +27,33 @@ export function SiteHeader() {
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const computeCount = () => {
+      try {
+        const raw = localStorage.getItem('ct_cart')
+        const list: { slug: string; quantity: number }[] = raw ? JSON.parse(raw) : []
+        const total = list.reduce((sum, it) => sum + Math.max(1, Number(it.quantity || 0)), 0)
+        setCartCount(total)
+      } catch (_) {
+        setCartCount(0)
+      }
+    }
+
+    computeCount()
+
+    const onCustom = () => computeCount()
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'ct_cart') computeCount()
+    }
+
+    window.addEventListener('ct_cart_updated', onCustom as EventListener)
+    window.addEventListener('storage', onStorage)
+    return () => {
+      window.removeEventListener('ct_cart_updated', onCustom as EventListener)
+      window.removeEventListener('storage', onStorage)
+    }
   }, [])
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false)
@@ -132,13 +160,21 @@ export function SiteHeader() {
               </Link>
 
               {/* Cart */}
-              <button
-                className="flex items-center space-x-2 text-sm font-medium text-muted hover:text-foreground transition-colors duration-200"
-                aria-label="Shopping cart (0 items)"
+              <Link
+                href="/cart"
+                className="relative flex items-center space-x-2 text-sm font-medium text-muted hover:text-foreground transition-colors duration-200"
+                aria-label={`Shopping cart${cartCount > 0 ? ` (${cartCount} items)` : ''}`}
               >
-                <ShoppingBag className="h-4 w-4" />
-                <span className="hidden sm:inline">Cart (0)</span>
-              </button>
+                <div className="relative">
+                  <ShoppingBag className="h-4 w-4" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[10px] leading-none flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </div>
+                <span className="hidden sm:inline">Cart</span>
+              </Link>
 
               {/* Mobile menu button */}
               <button

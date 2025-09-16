@@ -154,6 +154,11 @@ export default function ProductDetailPage() {
                 const status: 'out' | 'low' | 'in' = isInfinite
                   ? 'in'
                   : (Number(count) === 0 ? 'out' : Number(count) <= 5 ? 'low' : 'in')
+
+                if (isInfinite) {
+                  return <span className="text-green-400">In Stock</span>
+                }
+
                 return (
                   <>
                     {status === 'in' && <span className="text-green-400">In stock</span>}
@@ -214,6 +219,7 @@ export default function ProductDetailPage() {
                       list.push({ slug: slugVal, quantity: Math.max(1, quantity) })
                     }
                     localStorage.setItem('ct_cart', JSON.stringify(list))
+                    try { window.dispatchEvent(new Event('ct_cart_updated')) } catch (_) {}
                     router.push('/cart')
                   } catch (_) {
                     router.push('/cart')

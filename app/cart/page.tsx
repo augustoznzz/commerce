@@ -48,6 +48,7 @@ export default function CartPage() {
     setCart(next)
     try {
       localStorage.setItem('ct_cart', JSON.stringify(next))
+      window.dispatchEvent(new Event('ct_cart_updated'))
     } catch (_) {}
   }
 
