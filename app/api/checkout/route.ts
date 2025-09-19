@@ -58,7 +58,8 @@ export async function POST(req: NextRequest) {
         line_items,
         success_url: `${origin}/checkout/success`,
         cancel_url: `${origin}/checkout/cancel`,
-      }, opts)
+        ...opts,
+      })
       return NextResponse.redirect(session.url!, { status: 303 })
     }
 
@@ -82,7 +83,8 @@ export async function POST(req: NextRequest) {
         ],
         success_url: `${origin}/checkout/success`,
         cancel_url: `${origin}/checkout/cancel`,
-      }, opts)
+        ...opts,
+      })
       return NextResponse.redirect(session.url!, { status: 303 })
     }
 
@@ -98,7 +100,8 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: priceId, quantity }],
       success_url: `${origin}/checkout/success`,
       cancel_url: `${origin}/checkout/cancel`,
-    }, opts)
+      ...opts,
+    })
 
     return NextResponse.redirect(session.url!, { status: 303 })
   } catch (err: any) {
