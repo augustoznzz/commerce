@@ -46,7 +46,7 @@ export default function ProductDetailPage() {
 
   // Load admin-edited product from localStorage so stock/description stay in sync
   useEffect(() => {
-    if (!isClient) return
+    if (!isClient || typeof window === 'undefined') return
     
     try {
       const saved = localStorage.getItem('ct_products')

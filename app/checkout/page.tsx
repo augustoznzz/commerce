@@ -18,13 +18,17 @@ function CheckoutContent() {
 
   const [products, setProducts] = useState<Product[]>(PRODUCTS)
   const [quantity, setQuantity] = useState(Math.max(1, qtyFromUrl))
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
     // Load any admin-edited products from localStorage to keep pricing/images in sync
-    try {
-      const saved = localStorage.getItem('ct_products')
-      if (saved) setProducts(JSON.parse(saved))
-    } catch (_) {}
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('ct_products')
+        if (saved) setProducts(JSON.parse(saved))
+      } catch (_) {}
+    }
   }, [])
 
   const product = useMemo(() => {

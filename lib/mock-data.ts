@@ -49,15 +49,15 @@ export const PRODUCTS: Product[] = [
   // Development Tools
   {
     id: '1',
-    title: 'Visual Studio Code Pro',
-    price: 29.99,
+    title: 'Key',
+    price: 30,
     originalPrice: 49.99,
-    image: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=500&h=500&fit=crop&crop=center',
-    href: '/shop/vscode-pro',
+    image: '/images/key.png',
+    href: '/shop/key',
     badge: 'Sale',
-    category: 'Development Tools',
+    category: 'Keys',
     description: 'Professional code editor with advanced features',
-    htmlDescription: '<p>VS Code Pro delivers a premium editing experience with AI-assisted coding, integrated debugging, and extensible tooling.</p><ul><li>Integrated Git</li><li>Remote dev</li><li>Extensions marketplace</li></ul>',
+    htmlDescription: 'testando a descrição\n',
     rating: 4.8,
     reviews: 1250,
     inventory: 'in_stock',
@@ -70,6 +70,11 @@ export const PRODUCTS: Product[] = [
     variants: { colors: ['Dark', 'Light'], sizes: ['Single', 'Team'] },
     specs: { Platform: 'Windows / macOS / Linux', License: 'Per user', Updates: '1 year' },
     highlights: ['AI-assisted coding', 'Fast and lightweight', 'Rich ecosystem'],
+    // Stock management
+    stockMode: 'keys',
+    stockKeys: ['keyX'],
+    // Payments
+    stripeProductId: 'prod_T43A6IQ832zeQD',
   },
   {
     id: '2',

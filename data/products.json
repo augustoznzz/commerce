@@ -2,7 +2,7 @@
   {
     "id": "1",
     "title": "Key",
-    "price": 29.99,
+    "price": 20,
     "originalPrice": 49.99,
     "image": "/images/key.png",
     "href": "/shop/vscode-pro",
@@ -16,7 +16,8 @@
     "stockKeys": [
       "keyX"
     ],
-    "gallery": []
+    "gallery": [],
+    "stripeProductId": "prod_T43A6IQ832zeQD"
   },
   {
     "id": "1758014189551",

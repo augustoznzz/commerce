@@ -18,15 +18,17 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const [stock, setStock] = useState<string | null>(null)
   const [updatedProduct, setUpdatedProduct] = useState<Product>(product)
   const [isClient, setIsClient] = useState(false)
+  const [hasHydrated, setHasHydrated] = useState(false)
 
   // Ensure we're on the client side
   useEffect(() => {
     setIsClient(true)
+    setHasHydrated(true)
   }, [])
 
   // Function to update product data from localStorage
   const updateProductData = () => {
-    if (!isClient) return
+    if (!isClient || typeof window === 'undefined') return
     
     try {
       const saved = localStorage.getItem('ct_products')
@@ -53,14 +55,14 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
   }
 
   useEffect(() => {
-    if (isClient) {
+    if (isClient && hasHydrated) {
       updateProductData()
     }
-  }, [product, isClient])
+  }, [product, isClient, hasHydrated])
 
   // Listen for product updates from admin
   useEffect(() => {
-    if (!isClient) return
+    if (!isClient || !hasHydrated || typeof window === 'undefined') return
 
     const handleProductUpdate = () => {
       updateProductData()
@@ -79,7 +81,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       window.removeEventListener('ct_products_updated', handleProductUpdate)
       window.removeEventListener('storage', handleStorageChange)
     }
-  }, [product, isClient])
+  }, [product, isClient, hasHydrated])
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -118,19 +120,18 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               className="pointer-events-none absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"
             />
             
-            {/* Badge */}
-            {updatedProduct.badge && (
-              <div className="absolute top-4 left-4">
-                <span className={cn(
-                  "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                  updatedProduct.badge === 'New' && "bg-accent text-background",
-                  updatedProduct.badge === 'Best Seller' && "bg-green-500 text-white",
-                  updatedProduct.badge === 'Sale' && "bg-red-500 text-white"
-                )}>
-                  {updatedProduct.badge}
-                </span>
-              </div>
-            )}
+                  {/* Badge - Only show non-sale badges */}
+                  {updatedProduct.badge && updatedProduct.badge !== 'Sale' && (
+                    <div className="absolute top-4 left-4">
+                      <span className={cn(
+                        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+                        updatedProduct.badge === 'New' && "bg-accent text-background",
+                        updatedProduct.badge === 'Best Seller' && "bg-green-500 text-white"
+                      )}>
+                        {updatedProduct.badge}
+                      </span>
+                    </div>
+                  )}
 
             
 

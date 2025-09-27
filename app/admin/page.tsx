@@ -18,6 +18,16 @@ export default function AdminPage() {
 
   const [products, setProducts] = useState<Product[]>([])
 
+  // Helper function to generate slug from title
+  const generateSlug = (title: string): string => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .trim()
+  }
+
   // Load from localStorage
   useEffect(() => {
     try {
@@ -285,7 +295,15 @@ export default function AdminPage() {
               <input
                 type="text"
                 value={p.title}
-                onChange={(e)=>setProducts(products.map(x => x.id === p.id ? { ...x, title: e.target.value } : x))}
+                onChange={(e) => {
+                  const newTitle = e.target.value
+                  const newSlug = generateSlug(newTitle)
+                  setProducts(products.map(x => x.id === p.id ? { 
+                    ...x, 
+                    title: newTitle,
+                    href: `/shop/${newSlug}`
+                  } : x))
+                }}
                 className="w-full rounded-md bg-border/20 border border-border px-3 py-2 text-sm font-semibold"
               />
             </div>

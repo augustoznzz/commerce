@@ -22,10 +22,12 @@ export default function CartPage() {
   const [cart, setCart] = useState<CartItem[]>([])
 
   useEffect(() => {
-    try {
-      const savedProducts = localStorage.getItem('ct_products')
-      if (savedProducts) setProducts(JSON.parse(savedProducts))
-    } catch (_) {}
+    if (typeof window !== 'undefined') {
+      try {
+        const savedProducts = localStorage.getItem('ct_products')
+        if (savedProducts) setProducts(JSON.parse(savedProducts))
+      } catch (_) {}
+    }
   }, [])
 
   useEffect(() => {

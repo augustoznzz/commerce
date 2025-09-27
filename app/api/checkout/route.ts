@@ -28,16 +28,43 @@ export async function POST(req: NextRequest) {
       const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = []
 
       for (const ci of cart) {
-        const p = list.find(x => x.href.split('/').pop() === ci.slug)
+        const p = list.find(x => {
+          const slugFromHref = x.href.split('/').pop()
+          return slugFromHref === ci.slug
+        })
         if (!p) continue
-        const stripeProductId = p.stripeProductId || (p.title.toLowerCase().includes('key') ? 'prod_T43A6IQ832zeQD' : undefined)
+        const stripeProductId = p.stripeProductId
         if (stripeProductId) {
-          const productObj = await stripe.products.retrieve(stripeProductId, opts)
-          const defaultPrice = productObj.default_price
-          if (!defaultPrice) continue
-          const priceId = typeof defaultPrice === 'string' ? defaultPrice : defaultPrice.id
-          line_items.push({ price: priceId, quantity: Math.max(1, Number(ci.quantity || 1)) })
+          try {
+            const productObj = await stripe.products.retrieve(stripeProductId, opts)
+            const defaultPrice = productObj.default_price
+            if (!defaultPrice) {
+              // Fallback to custom line item if no default price
+              line_items.push({
+                price_data: {
+                  currency: 'brl',
+                  product_data: { name: p.title },
+                  unit_amount: Math.round(p.price * 100),
+                },
+                quantity: Math.max(1, Number(ci.quantity || 1)),
+              })
+            } else {
+              const priceId = typeof defaultPrice === 'string' ? defaultPrice : defaultPrice.id
+              line_items.push({ price: priceId, quantity: Math.max(1, Number(ci.quantity || 1)) })
+            }
+          } catch (error) {
+            // If Stripe product doesn't exist, fallback to custom line item
+            line_items.push({
+              price_data: {
+                currency: 'brl',
+                product_data: { name: p.title },
+                unit_amount: Math.round(p.price * 100),
+              },
+              quantity: Math.max(1, Number(ci.quantity || 1)),
+            })
+          }
         } else {
+          // No Stripe product ID configured, create custom line item
           line_items.push({
             price_data: {
               currency: 'brl',
@@ -63,12 +90,70 @@ export async function POST(req: NextRequest) {
       return NextResponse.redirect(session.url!, { status: 303 })
     }
 
-    const product = list.find(p => p.href.split('/').pop() === slug)
+    const product = list.find(p => {
+      const slugFromHref = p.href.split('/').pop()
+      return slugFromHref === slug
+    })
     if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 })
 
-    const stripeProductId = product.stripeProductId || (product.title.toLowerCase().includes('key') ? 'prod_T43A6IQ832zeQD' : undefined)
+    const stripeProductId = product.stripeProductId
 
-    if (!stripeProductId) {
+    if (stripeProductId) {
+      try {
+        const productObj = await stripe.products.retrieve(stripeProductId, opts)
+        const defaultPrice = productObj.default_price
+        if (!defaultPrice) {
+          // Fallback to custom line item if no default price
+          const session = await stripe.checkout.sessions.create({
+            mode: 'payment',
+            line_items: [
+              {
+                price_data: {
+                  currency: 'brl',
+                  product_data: { name: product.title },
+                  unit_amount: Math.round(product.price * 100),
+                },
+                quantity,
+              },
+            ],
+            success_url: `${origin}/checkout/success`,
+            cancel_url: `${origin}/checkout/cancel`,
+            ...opts,
+          })
+          return NextResponse.redirect(session.url!, { status: 303 })
+        } else {
+          const priceId = typeof defaultPrice === 'string' ? defaultPrice : defaultPrice.id
+          const session = await stripe.checkout.sessions.create({
+            mode: 'payment',
+            line_items: [{ price: priceId, quantity }],
+            success_url: `${origin}/checkout/success`,
+            cancel_url: `${origin}/checkout/cancel`,
+            ...opts,
+          })
+          return NextResponse.redirect(session.url!, { status: 303 })
+        }
+      } catch (error) {
+        // If Stripe product doesn't exist, fallback to custom line item
+        const session = await stripe.checkout.sessions.create({
+          mode: 'payment',
+          line_items: [
+            {
+              price_data: {
+                currency: 'brl',
+                product_data: { name: product.title },
+                unit_amount: Math.round(product.price * 100),
+              },
+              quantity,
+            },
+          ],
+          success_url: `${origin}/checkout/success`,
+          cancel_url: `${origin}/checkout/cancel`,
+          ...opts,
+        })
+        return NextResponse.redirect(session.url!, { status: 303 })
+      }
+    } else {
+      // No Stripe product ID configured, create custom line item
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         line_items: [
@@ -87,23 +172,6 @@ export async function POST(req: NextRequest) {
       })
       return NextResponse.redirect(session.url!, { status: 303 })
     }
-
-    const productObj = await stripe.products.retrieve(stripeProductId, opts)
-    const defaultPrice = productObj.default_price
-    if (!defaultPrice) {
-      return NextResponse.json({ error: 'Stripe product missing default price' }, { status: 400 })
-    }
-    const priceId = typeof defaultPrice === 'string' ? defaultPrice : defaultPrice.id
-
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      line_items: [{ price: priceId, quantity }],
-      success_url: `${origin}/checkout/success`,
-      cancel_url: `${origin}/checkout/cancel`,
-      ...opts,
-    })
-
-    return NextResponse.redirect(session.url!, { status: 303 })
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || 'Checkout failed' }, { status: 500 })
   }

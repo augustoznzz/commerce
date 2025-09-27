@@ -7,8 +7,11 @@ export function useProducts() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isClient, setIsClient] = useState(false)
 
   const fetchProducts = async () => {
+    if (typeof window === 'undefined') return
+    
     try {
       setLoading(true)
       const response = await fetch('/api/products')
@@ -29,11 +32,14 @@ export function useProducts() {
   }
 
   useEffect(() => {
+    setIsClient(true)
     fetchProducts()
   }, [])
 
   // Listen for product updates from admin
   useEffect(() => {
+    if (!isClient || typeof window === 'undefined') return
+
     const handleProductUpdate = () => {
       fetchProducts()
     }
@@ -44,7 +50,7 @@ export function useProducts() {
     return () => {
       window.removeEventListener('ct_products_updated', handleProductUpdate)
     }
-  }, [])
+  }, [isClient])
 
   return { products, loading, error, refetch: fetchProducts }
 }
