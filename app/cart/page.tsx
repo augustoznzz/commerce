@@ -6,11 +6,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { PRODUCTS, type Product } from '@/lib/mock-data'
 import { formatPrice } from '@/lib/utils'
-
-type CartItem = {
-  slug: string
-  quantity: number
-}
+import { 
+  getCartItems, 
+  saveCartItems, 
+  updateCartItemQuantity, 
+  removeFromCart, 
+  clearCart,
+  type CartItem 
+} from '@/lib/cart-utils'
 
 export default function CartPage() {
   const router = useRouter()
@@ -26,10 +29,8 @@ export default function CartPage() {
   }, [])
 
   useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem('ct_cart')
-      if (savedCart) setCart(JSON.parse(savedCart))
-    } catch (_) {}
+    // Load cart from session-based storage
+    setCart(getCartItems())
   }, [])
 
   const itemsDetailed = useMemo(() => {
@@ -46,23 +47,25 @@ export default function CartPage() {
 
   const updateCart = (next: CartItem[]) => {
     setCart(next)
-    try {
-      localStorage.setItem('ct_cart', JSON.stringify(next))
-      window.dispatchEvent(new Event('ct_cart_updated'))
-    } catch (_) {}
+    saveCartItems(next)
   }
 
   const setQty = (slug: string, q: number) => {
-    updateCart(
-      cart.map((it) => (it.slug === slug ? { ...it, quantity: Math.max(1, q) } : it))
-    )
+    updateCartItemQuantity(slug, q)
+    // Update local state to reflect the change
+    setCart(getCartItems())
   }
 
   const removeItem = (slug: string) => {
-    updateCart(cart.filter((it) => it.slug !== slug))
+    removeFromCart(slug)
+    // Update local state to reflect the change
+    setCart(getCartItems())
   }
 
-  const clearCart = () => updateCart([])
+  const clearCartHandler = () => {
+    clearCart()
+    setCart([])
+  }
 
   return (
     <div className="min-h-screen pt-20">
@@ -110,7 +113,7 @@ export default function CartPage() {
 
               <div className="flex justify-between">
                 <Link href="/shop" className="btn-secondary">Continue shopping</Link>
-                <button onClick={clearCart} className="text-sm text-muted hover:text-foreground">Clear cart</button>
+                <button onClick={clearCartHandler} className="text-sm text-muted hover:text-foreground">Clear cart</button>
               </div>
             </div>
 

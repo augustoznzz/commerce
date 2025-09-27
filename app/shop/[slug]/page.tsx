@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { PRODUCTS, type Product } from '@/lib/mock-data'
 import { formatPrice } from '@/lib/utils'
+import { addToCart } from '@/lib/cart-utils'
 import { Star, ChevronLeft, Check, X } from 'lucide-react'
 
 export default function ProductDetailPage() {
@@ -210,16 +211,7 @@ export default function ProductDetailPage() {
                 onClick={() => {
                   try {
                     const slugVal = (slug || '').toString()
-                    const raw = localStorage.getItem('ct_cart')
-                    const list: { slug: string; quantity: number }[] = raw ? JSON.parse(raw) : []
-                    const idx = list.findIndex((x) => x.slug === slugVal)
-                    if (idx >= 0) {
-                      list[idx].quantity = Math.max(1, (list[idx].quantity || 1) + quantity)
-                    } else {
-                      list.push({ slug: slugVal, quantity: Math.max(1, quantity) })
-                    }
-                    localStorage.setItem('ct_cart', JSON.stringify(list))
-                    try { window.dispatchEvent(new Event('ct_cart_updated')) } catch (_) {}
+                    addToCart(slugVal, quantity)
                     router.push('/cart')
                   } catch (_) {
                     router.push('/cart')

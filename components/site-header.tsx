@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ShoppingBag, User, Home, ShoppingCart, Info, Mail } from 'lucide-react'
 import { NAVIGATION_ITEMS } from '@/lib/constants'
 import { cn } from '@/lib/utils'
+import { getCartItemCount } from '@/lib/cart-utils'
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -31,28 +32,16 @@ export function SiteHeader() {
 
   useEffect(() => {
     const computeCount = () => {
-      try {
-        const raw = localStorage.getItem('ct_cart')
-        const list: { slug: string; quantity: number }[] = raw ? JSON.parse(raw) : []
-        const total = list.reduce((sum, it) => sum + Math.max(1, Number(it.quantity || 0)), 0)
-        setCartCount(total)
-      } catch (_) {
-        setCartCount(0)
-      }
+      setCartCount(getCartItemCount())
     }
 
     computeCount()
 
     const onCustom = () => computeCount()
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === 'ct_cart') computeCount()
-    }
 
     window.addEventListener('ct_cart_updated', onCustom as EventListener)
-    window.addEventListener('storage', onStorage)
     return () => {
       window.removeEventListener('ct_cart_updated', onCustom as EventListener)
-      window.removeEventListener('storage', onStorage)
     }
   }, [])
 

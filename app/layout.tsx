@@ -4,6 +4,7 @@ import './globals.css'
 import { SiteHeader } from '@/components/site-header'
 import { AccessibilityProvider } from '@/components/accessibility-provider'
 import { PerformanceMonitor } from '@/components/performance-monitor'
+import { SessionManager } from '@/components/session-manager'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -81,6 +82,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans bg-background text-foreground antialiased`}>
         <AccessibilityProvider>
           <PerformanceMonitor />
+          <SessionManager />
           <div className="flex min-h-screen flex-col">
             <SiteHeader />
             <main className="flex-1">
