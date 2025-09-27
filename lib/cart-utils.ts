@@ -118,3 +118,4 @@ export function clearCartOnSessionEnd(): void {
     // Silently fail if sessionStorage is not available
   }
 }
+

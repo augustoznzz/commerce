@@ -60,7 +60,7 @@ export function HeroAnimations({ type = 'floating' }: HeroAnimationsProps) {
           ease: "easeInOut",
           delay: 1
         }}
-        className="absolute -bottom-4 -left-4 bg-background border border-border text-foreground px-4 py-2 rounded-full text-sm font-medium shadow-lg"
+        className="absolute bottom-2 left-2 bg-background border border-border text-foreground px-4 py-2 rounded-full text-sm font-medium shadow-lg"
       >
         Free Shipping
       </motion.div>
