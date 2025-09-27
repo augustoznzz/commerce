@@ -82,7 +82,10 @@ export default function ProductDetailPage() {
           <div>
             <div className="relative aspect-square overflow-hidden rounded-xl bg-border/20">
               <Image
-                src={product.gallery?.[activeImage] || product.image || '/images/key.png'}
+                src={(() => {
+                  const allImages = [product.image, ...(product.gallery || [])].filter(Boolean)
+                  return allImages[activeImage] || '/images/key.png'
+                })()}
                 alt={product.title}
                 fill
                 priority
@@ -103,22 +106,26 @@ export default function ProductDetailPage() {
                 Zoom
               </button>
             </div>
-            {product.gallery && product.gallery.length > 1 && (
-              <div role="list" aria-label="Thumbnails" className="mt-3 grid grid-cols-5 gap-2">
-                {product.gallery.map((src, i) => (
-                  <button
-                    key={i}
-                    role="listitem"
-                    aria-label={`Image ${i + 1}`}
-                    onClick={() => setActiveImage(i)}
-                    className={`relative aspect-square overflow-hidden rounded border ${i === activeImage ? 'border-accent' : 'border-border'}`}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt="thumbnail" className="h-full w-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* Show thumbnails if there are multiple images (main + gallery) */}
+            {(() => {
+              const allImages = [product.image, ...(product.gallery || [])].filter(Boolean)
+              return allImages.length > 1 && (
+                <div role="list" aria-label="Thumbnails" className="mt-3 grid grid-cols-5 gap-2">
+                  {allImages.map((src, i) => (
+                    <button
+                      key={i}
+                      role="listitem"
+                      aria-label={`Image ${i + 1}`}
+                      onClick={() => setActiveImage(i)}
+                      className={`relative aspect-square overflow-hidden rounded border ${i === activeImage ? 'border-accent' : 'border-border'}`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={src} alt="thumbnail" className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )
+            })()}
           </div>
 
           {/* Right column */}
@@ -227,7 +234,7 @@ export default function ProductDetailPage() {
               </form>
             </div>
 
-            <p className="mb-8 text-sm text-muted">Free shipping over R$ 200. 30-day returns. Taxes included.</p>
+            <p className="mb-8 text-sm text-muted">Free shipping over R$ 200. 30-day returns. Taxes included. No account required for purchase.</p>
 
             {/* Rich HTML description */}
             {product.htmlDescription && (
@@ -299,7 +306,10 @@ export default function ProductDetailPage() {
             </button>
             <div className="relative aspect-video overflow-hidden rounded-lg bg-black">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={product.gallery?.[activeImage] || product.image || '/images/key.png'} alt={product.title} className="h-full w-full object-contain" />
+              <img src={(() => {
+                const allImages = [product.image, ...(product.gallery || [])].filter(Boolean)
+                return allImages[activeImage] || '/images/key.png'
+              })()} alt={product.title} className="h-full w-full object-contain" />
             </div>
           </div>
         </div>

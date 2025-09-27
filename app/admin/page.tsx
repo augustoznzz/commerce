@@ -152,10 +152,57 @@ export default function AdminPage() {
     reader.readAsDataURL(file)
   }
 
+  // Gallery image management functions
+  const updateGalleryImage = (id: string, index: number, url: string) => {
+    setProducts(products.map(p => {
+      if (p.id === id) {
+        const gallery = p.gallery || []
+        const newGallery = [...gallery]
+        newGallery[index] = url
+        return { ...p, gallery: newGallery }
+      }
+      return p
+    }))
+  }
+
+  const updateGalleryImageFromFile = (id: string, index: number, fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return
+    const file = fileList[0]
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = String(reader.result || '')
+      setProducts(prev => {
+        const next = prev.map(p => {
+          if (p.id === id) {
+            const gallery = p.gallery || []
+            const newGallery = [...gallery]
+            newGallery[index] = dataUrl
+            return { ...p, gallery: newGallery }
+          }
+          return p
+        })
+        try { localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(next)) } catch (_) {}
+        return next
+      })
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const removeGalleryImage = (id: string, index: number) => {
+    setProducts(products.map(p => {
+      if (p.id === id) {
+        const gallery = p.gallery || []
+        const newGallery = gallery.filter((_, i) => i !== index)
+        return { ...p, gallery: newGallery }
+      }
+      return p
+    }))
+  }
+
   if (!user) {
     return (
       <div className="container pt-24 pb-24 max-w-lg">
-        <h1 className="heading-md mb-6">Admin Login</h1>
+        <h1 className="heading-md mb-6">Login</h1>
         <div className="space-y-4 rounded-lg border border-border bg-border/10 p-6">
           <div>
             <label className="mb-1 block text-sm text-muted">Username</label>
@@ -211,31 +258,63 @@ export default function AdminPage() {
               />
               <div className="mt-1 text-xs text-muted">Example for 'Key': prod_T43A6IQ832zeQD</div>
             </div>
-            {/* Image controls */}
-            <div className="mb-4 flex items-center gap-4">
-              <div className="relative h-16 w-16 overflow-hidden rounded-md border border-border bg-border/20">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.image || '/images/key.png'} alt="preview" className="h-full w-full object-cover" />
-              </div>
-              <div className="flex-1">
-                <div className="mb-1 text-sm text-muted">Image URL</div>
-                <input
-                  type="text"
-                  value={p.image}
-                  onChange={(e)=>updateImageUrl(p.id, e.target.value)}
-                  placeholder="https://... or data:image/..."
-                  className="w-full rounded-md bg-border/20 border border-border px-3 py-2 text-sm"
-                />
-                <div className="mt-2 flex items-center gap-3 text-xs text-muted">
-                  <span>Or upload from device:</span>
-                  <div>
-                    <input id={`upload-${p.id}`} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e)=>updateImageFromFile(p.id, e.target.files)} />
-                    <label htmlFor={`upload-${p.id}`} className="inline-flex cursor-pointer items-center rounded-md border border-border px-3 py-1 text-foreground hover:border-border-hover hover:bg-border/20">
-                      Choose image
-                    </label>
+            {/* Image Gallery Controls */}
+            <div className="mb-4">
+              <div className="mb-2 text-sm text-muted">Product Images (up to 5)</div>
+              <div className="grid grid-cols-5 gap-2">
+                {/* Main Image */}
+                <div className="space-y-2">
+                  <div className="text-xs text-muted">Main Image</div>
+                  <div className="relative h-20 w-20 overflow-hidden rounded-md border border-border bg-border/20">
+                    <img src={p.image || '/images/key.png'} alt="main preview" className="h-full w-full object-cover" />
                   </div>
-                  <button onClick={()=>updateImageUrl(p.id, '/images/key.png')} className="rounded-md border border-border px-2 py-1 text-foreground hover:border-border-hover hover:bg-border/20">Reset</button>
+                  <input
+                    type="text"
+                    value={p.image || ''}
+                    onChange={(e)=>updateImageUrl(p.id, e.target.value)}
+                    placeholder="Main image URL"
+                    className="w-full rounded-md bg-border/20 border border-border px-2 py-1 text-xs"
+                  />
+                  <div className="flex gap-1">
+                    <input id={`upload-main-${p.id}`} type="file" accept="image/*" className="hidden" onChange={(e)=>updateImageFromFile(p.id, e.target.files)} />
+                    <label htmlFor={`upload-main-${p.id}`} className="cursor-pointer rounded border border-border px-2 py-1 text-xs hover:border-border-hover hover:bg-border/20">
+                      Upload
+                    </label>
+                    <button onClick={()=>updateImageUrl(p.id, '/images/key.png')} className="rounded border border-border px-2 py-1 text-xs hover:border-border-hover hover:bg-border/20">
+                      Reset
+                    </button>
+                  </div>
                 </div>
+
+                {/* Gallery Images */}
+                {[1, 2, 3, 4].map((index) => {
+                  const galleryImages = p.gallery || []
+                  const imageUrl = galleryImages[index - 1] || ''
+                  return (
+                    <div key={index} className="space-y-2">
+                      <div className="text-xs text-muted">Gallery {index}</div>
+                      <div className="relative h-20 w-20 overflow-hidden rounded-md border border-border bg-border/20">
+                        <img src={imageUrl || '/images/key.png'} alt={`gallery ${index}`} className="h-full w-full object-cover" />
+                      </div>
+                      <input
+                        type="text"
+                        value={imageUrl}
+                        onChange={(e)=>updateGalleryImage(p.id, index - 1, e.target.value)}
+                        placeholder={`Gallery ${index} URL`}
+                        className="w-full rounded-md bg-border/20 border border-border px-2 py-1 text-xs"
+                      />
+                      <div className="flex gap-1">
+                        <input id={`upload-gallery-${index}-${p.id}`} type="file" accept="image/*" className="hidden" onChange={(e)=>updateGalleryImageFromFile(p.id, index - 1, e.target.files)} />
+                        <label htmlFor={`upload-gallery-${index}-${p.id}`} className="cursor-pointer rounded border border-border px-2 py-1 text-xs hover:border-border-hover hover:bg-border/20">
+                          Upload
+                        </label>
+                        <button onClick={()=>removeGalleryImage(p.id, index - 1)} className="rounded border border-border px-2 py-1 text-xs hover:border-border-hover hover:bg-border/20">
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
             <div className="mb-4">

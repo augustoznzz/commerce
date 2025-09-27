@@ -140,7 +140,7 @@ export default function CartPage() {
                   <button type="submit" className="btn-primary w-full">Checkout</button>
                 </form>
                 <div className="mt-3 text-center text-xs text-muted">
-                  You will be redirected to Stripe to complete your purchase.
+                  No account required! You will be redirected to Stripe to complete your purchase.
                 </div>
               </div>
             </div>

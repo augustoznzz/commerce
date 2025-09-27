@@ -75,8 +75,8 @@ function CheckoutContent() {
               </div>
 
               <div className="rounded-lg border border-border bg-border/10 p-4">
-                <div className="mb-2 text-sm text-muted">Billing</div>
-                <p className="text-sm text-muted">Payments are processed securely with Stripe.</p>
+                <div className="mb-2 text-sm text-muted">Guest Checkout</div>
+                <p className="text-sm text-muted">No account required! Payments are processed securely with Stripe. You'll receive a receipt via email after purchase.</p>
               </div>
             </div>
 
@@ -104,7 +104,7 @@ function CheckoutContent() {
                   <button type="submit" className="btn-primary w-full">Pay with Stripe</button>
                 </form>
                 <div className="mt-3 text-center text-xs text-muted">
-                  You will be redirected to Stripe to complete your purchase.
+                  No account required! You will be redirected to Stripe to complete your purchase.
                 </div>
               </div>
             </div>
