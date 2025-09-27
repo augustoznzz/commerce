@@ -63,7 +63,7 @@ export function Hero() {
           <div className="relative">
             <div className="relative aspect-square max-w-lg mx-auto">
               <Image
-                src="https://media.discordapp.net/attachments/1402093523007836181/1421510505473900664/IMG_0681.jpg?ex=68d94c52&is=68d7fad2&hm=b1573bfdd6dde7e5e4e0d7ee1d5ded319ec90b447cc5d7eef19cbd59d6fbb32d&=&format=webp&width=706&height=967"
+                src="https://media.discordapp.net/attachments/1402093523007836181/1421508934467846234/IMG_0562_Original.jpg?ex=68d94adc&is=68d7f95c&hm=ae68c1204756383bd4bfe6248ad666a22772b40106e08406d268c22f845c5b76&=&format=webp&width=706&height=967"
                 alt="Premium wireless headphones with sleek design"
                 fill
                 className="object-cover rounded-2xl shadow-2xl"
