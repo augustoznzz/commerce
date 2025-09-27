@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
-import { PRODUCTS, type Product } from '@/lib/mock-data'
+import { type Product } from '@/lib/mock-data'
 import { formatPrice } from '@/lib/utils'
 import { addToCart } from '@/lib/cart-utils'
 import { Star, ChevronLeft, Check, X } from 'lucide-react'
@@ -13,11 +13,8 @@ export default function ProductDetailPage() {
   const router = useRouter()
   const slug = Array.isArray(params?.slug) ? params?.slug[0] : params?.slug
 
-  const initialProduct: Product | undefined = useMemo(
-    () => PRODUCTS.find((p) => p.href.split('/').pop() === slug),
-    [slug]
-  )
-  const [product, setProduct] = useState<Product | undefined>(initialProduct)
+  const [product, setProduct] = useState<Product | undefined>(undefined)
+  const [loading, setLoading] = useState(true)
 
   const [quantity, setQuantity] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
@@ -44,18 +41,47 @@ export default function ProductDetailPage() {
     setIsClient(true)
   }, [])
 
-  // Load admin-edited product from localStorage so stock/description stay in sync
+  // Load product from API and localStorage
   useEffect(() => {
     if (!isClient || typeof window === 'undefined') return
     
-    try {
-      const saved = localStorage.getItem('ct_products')
-      if (saved) {
-        const list: Product[] = JSON.parse(saved)
-        const p = list.find((x) => x.href.split('/').pop() === slug)
-        if (p) setProduct(p)
+    const loadProduct = async () => {
+      setLoading(true)
+      try {
+        // Try API first
+        const response = await fetch('/api/products')
+        if (response.ok) {
+          const products: Product[] = await response.json()
+          const foundProduct = products.find((x) => x.href.split('/').pop() === slug)
+          if (foundProduct) {
+            setProduct(foundProduct)
+            setLoading(false)
+            return
+          }
+        }
+        
+        // Fallback to localStorage
+        const saved = localStorage.getItem('ct_products')
+        if (saved) {
+          const list: Product[] = JSON.parse(saved)
+          const p = list.find((x) => x.href.split('/').pop() === slug)
+          if (p) {
+            setProduct(p)
+            setLoading(false)
+            return
+          }
+        }
+        
+        // Product not found
+        setProduct(undefined)
+        setLoading(false)
+      } catch (error) {
+        console.error('Error loading product:', error)
+        setLoading(false)
       }
-    } catch (_) {}
+    }
+    
+    loadProduct()
   }, [slug, isClient])
 
   useEffect(() => {
@@ -66,6 +92,19 @@ export default function ProductDetailPage() {
       setSelectedModel(null)
     }
   }, [product])
+
+  if (loading) {
+    return (
+      <div className="container pt-24 pb-24">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto mb-4"></div>
+            <p className="text-muted">Loading product...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (!product) {
     return (

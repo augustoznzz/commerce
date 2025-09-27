@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PRODUCTS } from '@/lib/mock-data'
 import { writeFile, readFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
@@ -25,11 +24,11 @@ export async function GET() {
       return NextResponse.json(products)
     }
     
-    // Return default products if no custom data exists
-    return NextResponse.json(PRODUCTS)
+    // Return empty array if no products exist yet
+    return NextResponse.json([])
   } catch (error) {
     console.error('Error fetching products:', error)
-    return NextResponse.json(PRODUCTS) // Fallback to default products
+    return NextResponse.json([]) // Return empty array on error
   }
 }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { PRODUCTS as DEFAULT_PRODUCTS, type Product } from '@/lib/mock-data'
+import { type Product } from '@/lib/mock-data'
 import { formatPrice } from '@/lib/utils'
 
 type User = { username: string }
@@ -28,21 +28,42 @@ export default function AdminPage() {
       .trim()
   }
 
-  // Load from localStorage
+  // Load from localStorage and API
   useEffect(() => {
-    try {
-      const savedAuth = localStorage.getItem(STORAGE_KEYS.auth)
-      if (savedAuth) setUser(JSON.parse(savedAuth))
+    const loadData = async () => {
+      try {
+        // Load auth
+        const savedAuth = localStorage.getItem(STORAGE_KEYS.auth)
+        if (savedAuth) setUser(JSON.parse(savedAuth))
 
-      const savedProducts = localStorage.getItem(STORAGE_KEYS.products)
-      if (savedProducts) {
-        setProducts(JSON.parse(savedProducts))
-      } else {
-        setProducts(DEFAULT_PRODUCTS)
+        // Try to load products from API first
+        try {
+          const response = await fetch('/api/products')
+          if (response.ok) {
+            const apiProducts = await response.json()
+            setProducts(apiProducts)
+            // Sync to localStorage
+            localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(apiProducts))
+            return
+          }
+        } catch (apiError) {
+          console.log('API not available, checking localStorage')
+        }
+
+        // Fallback to localStorage
+        const savedProducts = localStorage.getItem(STORAGE_KEYS.products)
+        if (savedProducts) {
+          setProducts(JSON.parse(savedProducts))
+        } else {
+          // Start with empty array if no products exist
+          setProducts([])
+        }
+      } catch (_) {
+        setProducts([])
       }
-    } catch (_) {
-      setProducts(DEFAULT_PRODUCTS)
     }
+    
+    loadData()
   }, [])
 
   // Helper function to save products to both localStorage and API
@@ -105,19 +126,23 @@ export default function AdminPage() {
 
   const addProduct = () => {
     const id = String(Date.now())
+    const newTitle = 'New Product'
+    const newSlug = generateSlug(newTitle)
     setProducts([
       ...products,
       {
         id,
-        title: 'New Product',
+        title: newTitle,
         price: 99.9,
         image: '/images/key.png',
-        href: `/shop/new-${id}`,
+        href: `/shop/${newSlug}`,
         category: 'General',
         description: 'A newly added product with a placeholder description.',
         htmlDescription: '<p>Edit this rich description in the admin panel.</p>',
         rating: 4.5,
         reviews: 10,
+        stockMode: 'infinite',
+        stockKeys: [],
       },
     ])
   }

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { PRODUCTS, type Product } from '@/lib/mock-data'
+import { type Product } from '@/lib/mock-data'
 import { getStripeFromEnv, buildStripeRequestOptions } from '@/lib/stripe'
+import { readFile, existsSync } from 'fs'
+import { readFile as readFileAsync } from 'fs/promises'
+import path from 'path'
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,7 +20,17 @@ export async function POST(req: NextRequest) {
     const slug = String(formData.get('slug') || '')
     const quantity = Math.max(1, Number(formData.get('quantity') || 1))
 
-    const list: Product[] = PRODUCTS
+    // Load products from file system
+    let list: Product[] = []
+    try {
+      const PRODUCTS_FILE_PATH = path.join(process.cwd(), 'data', 'products.json')
+      if (existsSync(PRODUCTS_FILE_PATH)) {
+        const data = await readFileAsync(PRODUCTS_FILE_PATH, 'utf-8')
+        list = JSON.parse(data)
+      }
+    } catch (error) {
+      console.error('Error loading products from file:', error)
+    }
 
     const stripe = getStripeFromEnv()
     const opts = buildStripeRequestOptions()

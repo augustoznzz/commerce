@@ -1,11 +1,11 @@
 [
   {
     "id": "1",
-    "title": "Key",
+    "title": "key",
     "price": 20,
     "originalPrice": 49.99,
     "image": "/images/key.png",
-    "href": "/shop/vscode-pro",
+    "href": "/shop/key",
     "badge": "Sale",
     "category": "Keys",
     "description": "Professional code editor with advanced features",
@@ -17,7 +17,7 @@
       "keyX"
     ],
     "gallery": [],
-    "stripeProductId": "prod_T43A6IQ832zeQD"
+    "stripeProductId": ""
   },
   {
     "id": "1758014189551",
