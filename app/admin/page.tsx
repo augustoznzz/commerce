@@ -35,17 +35,24 @@ export default function AdminPage() {
     }
   }, [])
 
-  useEffect(() => {
+  // Helper function to save products and notify other components
+  const saveProductsAndNotify = (updatedProducts: Product[]) => {
     try {
-      if (products.length) {
-        localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(products))
-      }
+      localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(updatedProducts))
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event('ct_products_updated'))
     } catch (_) {}
+  }
+
+  useEffect(() => {
+    if (products.length) {
+      saveProductsAndNotify(products)
+    }
   }, [products])
 
   const saveProductsToStorage = () => {
     try {
-      localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(products))
+      saveProductsAndNotify(products)
       alert('Changes saved')
     } catch (_) {
       alert('Failed to save changes')
@@ -75,7 +82,7 @@ export default function AdminPage() {
         id,
         title: 'New Product',
         price: 99.9,
-        image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&h=500&fit=crop&crop=center',
+        image: '/images/key.png',
         href: `/shop/new-${id}`,
         category: 'General',
         description: 'A newly added product with a placeholder description.',

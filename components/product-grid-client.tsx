@@ -1,11 +1,59 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { ProductCard } from './product-card'
-import { PRODUCTS } from '@/lib/mock-data'
+import { PRODUCTS, type Product } from '@/lib/mock-data'
 
 export function ProductGridClient() {
-  const featuredProducts = PRODUCTS.slice(0, 6)
+  const [products, setProducts] = useState<Product[]>(PRODUCTS)
+
+  // Load admin-modified products from localStorage if present
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('ct_products')
+      if (saved) {
+        const savedProducts = JSON.parse(saved)
+        setProducts(savedProducts)
+      }
+    } catch (_) {
+      // Fallback to default products if localStorage fails
+      setProducts(PRODUCTS)
+    }
+  }, [])
+
+  // Listen for product updates from admin
+  useEffect(() => {
+    const handleProductUpdate = () => {
+      try {
+        const saved = localStorage.getItem('ct_products')
+        if (saved) {
+          const savedProducts = JSON.parse(saved)
+          setProducts(savedProducts)
+        }
+      } catch (_) {
+        setProducts(PRODUCTS)
+      }
+    }
+
+    // Listen for storage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'ct_products') {
+        handleProductUpdate()
+      }
+    }
+
+    // Listen for custom product update events
+    window.addEventListener('ct_products_updated', handleProductUpdate)
+    window.addEventListener('storage', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('ct_products_updated', handleProductUpdate)
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [])
+
+  const featuredProducts = products.slice(0, 6)
 
   return (
     <motion.div

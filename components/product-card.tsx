@@ -16,19 +16,57 @@ interface ProductCardProps {
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const [stock, setStock] = useState<string | null>(null)
+  const [updatedProduct, setUpdatedProduct] = useState<Product>(product)
 
-  useEffect(() => {
+  // Function to update product data from localStorage
+  const updateProductData = () => {
     try {
       const saved = localStorage.getItem('ct_products')
       if (saved) {
         const list = JSON.parse(saved) as Product[]
         const found = list.find(p => p.id === product.id || p.href === product.href)
         if (found) {
+          setUpdatedProduct(found)
           const val = found.stockMode === 'infinite' ? '∞' : String(found.stockMode === 'keys' ? (found.stockKeys?.length || 0) : (found.stockCount ?? 0))
           setStock(val)
+        } else {
+          // If product not found in localStorage, use original product
+          setUpdatedProduct(product)
+          setStock(null)
         }
+      } else {
+        setUpdatedProduct(product)
+        setStock(null)
       }
-    } catch (_) {}
+    } catch (_) {
+      setUpdatedProduct(product)
+      setStock(null)
+    }
+  }
+
+  useEffect(() => {
+    updateProductData()
+  }, [product])
+
+  // Listen for product updates from admin
+  useEffect(() => {
+    const handleProductUpdate = () => {
+      updateProductData()
+    }
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'ct_products') {
+        updateProductData()
+      }
+    }
+
+    window.addEventListener('ct_products_updated', handleProductUpdate)
+    window.addEventListener('storage', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('ct_products_updated', handleProductUpdate)
+      window.removeEventListener('storage', handleStorageChange)
+    }
   }, [product])
   return (
     <motion.div
@@ -39,9 +77,9 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       className="group"
     >
       <Link
-        href={product.href}
+        href={updatedProduct.href}
         className="block"
-        aria-label={`View ${product.title} product details`}
+        aria-label={`View ${updatedProduct.title} product details`}
       >
         <div className="relative overflow-hidden rounded-xl bg-border/20 card-hover">
           {/* Glow backdrop */}
@@ -53,8 +91,8 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           {/* Product Image */}
           <div className="relative aspect-square">
             <Image
-              src={product.image || '/images/key.png'}
-              alt={product.title}
+              src={updatedProduct.image || '/images/key.png'}
+              alt={updatedProduct.title}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -69,15 +107,15 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             />
             
             {/* Badge */}
-            {product.badge && (
+            {updatedProduct.badge && (
               <div className="absolute top-4 left-4">
                 <span className={cn(
                   "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                  product.badge === 'New' && "bg-accent text-background",
-                  product.badge === 'Best Seller' && "bg-green-500 text-white",
-                  product.badge === 'Sale' && "bg-red-500 text-white"
+                  updatedProduct.badge === 'New' && "bg-accent text-background",
+                  updatedProduct.badge === 'Best Seller' && "bg-green-500 text-white",
+                  updatedProduct.badge === 'Sale' && "bg-red-500 text-white"
                 )}>
-                  {product.badge}
+                  {updatedProduct.badge}
                 </span>
               </div>
             )}
@@ -91,12 +129,12 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           {/* Product Info */}
           <div className="p-6">
             {/* Category */}
-            {(product.category || stock !== null) && (
+            {(updatedProduct.category || stock !== null) && (
               <div className="flex items-center gap-2 mb-2">
-                {product.category && (
+                {updatedProduct.category && (
                   <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs text-muted">
                     <Tag className="h-3 w-3 text-muted" />
-                    {product.category}
+                    {updatedProduct.category}
                   </span>
                 )}
                 {stock !== null && (
@@ -106,18 +144,18 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             )}
             
             <h3 className="font-semibold text-foreground group-hover:text-accent transition-colors duration-200 mb-2 line-clamp-2">
-              {product.title}
+              {updatedProduct.title}
             </h3>
             
             {/* Description */}
-            {product.description && (
+            {updatedProduct.description && (
               <p className="text-sm text-muted mb-3 line-clamp-2">
-                {product.description}
+                {updatedProduct.description}
               </p>
             )}
             
             {/* Rating */}
-            {product.rating && (
+            {updatedProduct.rating && (
               <div className="flex items-center gap-2 mb-3">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
@@ -125,13 +163,13 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                       key={i}
                       className={cn(
                         "h-4 w-4",
-                        i < Math.floor(product.rating || 0) ? "text-yellow-400 fill-current" : "text-gray-300"
+                        i < Math.floor(updatedProduct.rating || 0) ? "text-yellow-400 fill-current" : "text-gray-300"
                       )}
                     />
                   ))}
                 </div>
                 <span className="text-sm text-muted">
-                  {product.rating} ({product.reviews?.toLocaleString()} reviews)
+                  {updatedProduct.rating} ({updatedProduct.reviews?.toLocaleString()} reviews)
                 </span>
               </div>
             )}
@@ -139,11 +177,11 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             {/* Price */}
             <div className="flex items-center gap-2">
               <p className="text-xl font-bold text-accent">
-                {formatPrice(product.price)}
+                {formatPrice(updatedProduct.price)}
               </p>
-              {product.originalPrice && (
+              {updatedProduct.originalPrice && (
                 <p className="text-sm text-muted line-through">
-                  {formatPrice(product.originalPrice)}
+                  {formatPrice(updatedProduct.originalPrice)}
                 </p>
               )}
             </div>
