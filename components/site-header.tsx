@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ShoppingBag, User, Home, ShoppingCart, Info, Mail } from 'lucide-react'
+import { Menu, X, ShoppingBag, Home, ShoppingCart, Info, Mail } from 'lucide-react'
 import { NAVIGATION_ITEMS } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { getCartItemCount } from '@/lib/cart-utils'
@@ -139,15 +139,6 @@ export function SiteHeader() {
 
             {/* Right side actions */}
             <div className="flex items-center space-x-4">
-              {/* Sign In */}
-              <Link
-                href="/admin"
-                className="hidden sm:flex items-center space-x-2 text-sm font-medium text-muted hover:text-foreground transition-colors duration-200"
-              >
-                <User className="h-4 w-4" />
-                <span>Sign in</span>
-              </Link>
-
               {/* Cart */}
               <Link
                 href="/cart"
@@ -213,15 +204,6 @@ export function SiteHeader() {
                     )
                   })}
                   
-                  {/* Mobile Sign In */}
-                  <Link
-                    href="/admin"
-                    onClick={closeMobileMenu}
-                    className="flex items-center space-x-2 text-base font-medium text-muted hover:text-foreground transition-colors duration-200 pt-4 border-t border-border/40"
-                  >
-                    <User className="h-4 w-4" />
-                    <span>Sign in</span>
-                  </Link>
                 </nav>
               </div>
             </motion.div>

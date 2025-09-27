@@ -37,8 +37,17 @@ export default function ProductDetailPage() {
     return () => window.removeEventListener('keydown', onKey)
   }, [product])
 
+  const [isClient, setIsClient] = useState(false)
+
+  // Ensure we're on the client side
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   // Load admin-edited product from localStorage so stock/description stay in sync
   useEffect(() => {
+    if (!isClient) return
+    
     try {
       const saved = localStorage.getItem('ct_products')
       if (saved) {
@@ -47,7 +56,7 @@ export default function ProductDetailPage() {
         if (p) setProduct(p)
       }
     } catch (_) {}
-  }, [slug])
+  }, [slug, isClient])
 
   useEffect(() => {
     // Initialize default model selection
@@ -257,21 +266,13 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Accordion */}
-            <div className="mb-8">
-              <details className="mb-2 rounded-md border border-border p-4">
-                <summary className="cursor-pointer">Care</summary>
-                <div className="mt-2 text-sm text-muted">Keep your license key safe. Do not share publicly.</div>
-              </details>
-              <details className="mb-2 rounded-md border border-border p-4">
-                <summary className="cursor-pointer">Materials</summary>
-                <div className="mt-2 text-sm text-muted">Digital delivery only.</div>
-              </details>
-              <details className="rounded-md border border-border p-4">
-                <summary className="cursor-pointer">Fit</summary>
-                <div className="mt-2 text-sm text-muted">Works on Windows, macOS and Linux.</div>
-              </details>
-            </div>
+             {/* Accordion */}
+             <div className="mb-8">
+               <details className="rounded-md border border-border p-4">
+                 <summary className="cursor-pointer">Notes</summary>
+                 <div className="mt-2 text-sm text-muted">Keep your license key safe. Do not share publicly.</div>
+               </details>
+             </div>
 
             {/* Highlights */}
             {product.highlights && (

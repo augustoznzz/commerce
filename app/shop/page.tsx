@@ -1,25 +1,17 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { ShoppingBag, Filter, Search, X, ChevronDown } from 'lucide-react'
 import { ProductCard } from '@/components/product-card'
-import { PRODUCTS } from '@/lib/mock-data'
+import { useProducts } from '@/lib/hooks/use-products'
 import { cn } from '@/lib/utils'
 
 export default function ShopPage() {
-  const [allProducts, setAllProducts] = useState(PRODUCTS)
+  const { products: allProducts, loading } = useProducts()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [showFilters, setShowFilters] = useState(false)
   const [sortBy, setSortBy] = useState('name')
-
-  // Load admin-modified products from localStorage if present
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('ct_products')
-      if (saved) setAllProducts(JSON.parse(saved))
-    } catch (_) {}
-  }, [])
 
   // Get unique categories
   const categories = ['All', ...Array.from(new Set(allProducts.map(p => p.category).filter(Boolean)))]

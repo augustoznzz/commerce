@@ -35,10 +35,29 @@ export default function AdminPage() {
     }
   }, [])
 
-  // Helper function to save products and notify other components
-  const saveProductsAndNotify = (updatedProducts: Product[]) => {
+  // Helper function to save products to both localStorage and API
+  const saveProductsAndNotify = async (updatedProducts: Product[]) => {
     try {
+      // Save to localStorage for immediate local updates
       localStorage.setItem(STORAGE_KEYS.products, JSON.stringify(updatedProducts))
+      
+      // Save to API for global sync
+      try {
+        const response = await fetch('/api/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedProducts),
+        })
+        
+        if (!response.ok) {
+          console.error('Failed to sync products to server')
+        }
+      } catch (error) {
+        console.error('Error syncing products:', error)
+      }
+      
       // Dispatch custom event to notify other components
       window.dispatchEvent(new Event('ct_products_updated'))
     } catch (_) {}
@@ -50,10 +69,10 @@ export default function AdminPage() {
     }
   }, [products])
 
-  const saveProductsToStorage = () => {
+  const saveProductsToStorage = async () => {
     try {
-      saveProductsAndNotify(products)
-      alert('Changes saved')
+      await saveProductsAndNotify(products)
+      alert('Changes saved and synced globally!')
     } catch (_) {
       alert('Failed to save changes')
     }
@@ -199,6 +218,31 @@ export default function AdminPage() {
     }))
   }
 
+  const addGallerySlot = (id: string) => {
+    setProducts(products.map(p => {
+      if (p.id === id) {
+        const gallery = p.gallery || []
+        if (gallery.length < 4) {
+          const newGallery = [...gallery, '']
+          return { ...p, gallery: newGallery }
+        }
+        return p
+      }
+      return p
+    }))
+  }
+
+  const clearAllGalleryImages = (id: string) => {
+    if (confirm('Are you sure you want to clear all gallery images for this product?')) {
+      setProducts(products.map(p => {
+        if (p.id === id) {
+          return { ...p, gallery: [] }
+        }
+        return p
+      }))
+    }
+  }
+
   if (!user) {
     return (
       <div className="container pt-24 pb-24 max-w-lg">
@@ -260,13 +304,46 @@ export default function AdminPage() {
             </div>
             {/* Image Gallery Controls */}
             <div className="mb-4">
-              <div className="mb-2 text-sm text-muted">Product Images (up to 5)</div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-sm text-muted">
+                  Product Images ({(() => {
+                    const totalImages = (p.image ? 1 : 0) + (p.gallery?.length || 0)
+                    return `${totalImages}/5`
+                  })()})
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => addGallerySlot(p.id)}
+                    disabled={(p.gallery?.length || 0) >= 4}
+                    className="rounded border border-border px-2 py-1 text-xs hover:border-border-hover hover:bg-border/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    + Add Image
+                  </button>
+                  <button 
+                    onClick={() => clearAllGalleryImages(p.id)}
+                    className="rounded border border-red-500/50 px-2 py-1 text-xs text-red-400 hover:border-red-500 hover:bg-red-500/10"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </div>
+              
               <div className="grid grid-cols-5 gap-2">
                 {/* Main Image */}
                 <div className="space-y-2">
-                  <div className="text-xs text-muted">Main Image</div>
+                  <div className="flex items-center gap-1">
+                    <div className="text-xs text-muted">Main Image</div>
+                    {p.image && p.image !== '/images/key.png' && (
+                      <span className="h-2 w-2 rounded-full bg-green-500" title="Image set"></span>
+                    )}
+                  </div>
                   <div className="relative h-20 w-20 overflow-hidden rounded-md border border-border bg-border/20">
                     <img src={p.image || '/images/key.png'} alt="main preview" className="h-full w-full object-cover" />
+                    {p.image && p.image !== '/images/key.png' && (
+                      <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
+                        <span className="text-xs text-green-400 font-semibold">✓</span>
+                      </div>
+                    )}
                   </div>
                   <input
                     type="text"
@@ -290,11 +367,28 @@ export default function AdminPage() {
                 {[1, 2, 3, 4].map((index) => {
                   const galleryImages = p.gallery || []
                   const imageUrl = galleryImages[index - 1] || ''
+                  const hasImage = imageUrl && imageUrl !== '/images/key.png'
+                  
                   return (
                     <div key={index} className="space-y-2">
-                      <div className="text-xs text-muted">Gallery {index}</div>
+                      <div className="flex items-center gap-1">
+                        <div className="text-xs text-muted">Gallery {index}</div>
+                        {hasImage && (
+                          <span className="h-2 w-2 rounded-full bg-green-500" title="Image set"></span>
+                        )}
+                      </div>
                       <div className="relative h-20 w-20 overflow-hidden rounded-md border border-border bg-border/20">
                         <img src={imageUrl || '/images/key.png'} alt={`gallery ${index}`} className="h-full w-full object-cover" />
+                        {hasImage && (
+                          <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
+                            <span className="text-xs text-green-400 font-semibold">✓</span>
+                          </div>
+                        )}
+                        {!hasImage && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-xs text-muted">Empty</span>
+                          </div>
+                        )}
                       </div>
                       <input
                         type="text"
@@ -308,13 +402,24 @@ export default function AdminPage() {
                         <label htmlFor={`upload-gallery-${index}-${p.id}`} className="cursor-pointer rounded border border-border px-2 py-1 text-xs hover:border-border-hover hover:bg-border/20">
                           Upload
                         </label>
-                        <button onClick={()=>removeGalleryImage(p.id, index - 1)} className="rounded border border-border px-2 py-1 text-xs hover:border-border-hover hover:bg-border/20">
+                        <button onClick={()=>removeGalleryImage(p.id, index - 1)} className="rounded border border-red-500/50 px-2 py-1 text-xs text-red-400 hover:border-red-500 hover:bg-red-500/10">
                           Remove
                         </button>
                       </div>
                     </div>
                   )
                 })}
+              </div>
+              
+              {/* Image Management Tips */}
+              <div className="mt-3 p-3 bg-border/10 rounded-md">
+                <div className="text-xs text-muted space-y-1">
+                  <div><strong>Tips:</strong></div>
+                  <div>• Main image appears first in product gallery</div>
+                  <div>• Gallery images show as thumbnails below main image</div>
+                  <div>• Maximum 5 images total (1 main + 4 gallery)</div>
+                  <div>• Use high-quality images for best results</div>
+                </div>
               </div>
             </div>
             <div className="mb-4">

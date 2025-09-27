@@ -1,0 +1,69 @@
+[
+  {
+    "id": "1",
+    "title": "Key",
+    "price": 29.99,
+    "originalPrice": 49.99,
+    "image": "/images/key.png",
+    "href": "/shop/vscode-pro",
+    "badge": "Sale",
+    "category": "Keys",
+    "description": "Professional code editor with advanced features",
+    "rating": 4.8,
+    "reviews": 1250,
+    "htmlDescription": "testando a descrição\n",
+    "stockMode": "keys",
+    "stockKeys": [
+      "keyX"
+    ],
+    "gallery": []
+  },
+  {
+    "id": "1758014189551",
+    "title": "Product",
+    "price": 105.5,
+    "image": "/images/key.png",
+    "href": "/shop/new-1758014189551",
+    "category": "General",
+    "description": "A newly added product with a placeholder description.",
+    "htmlDescription": "<p>Edit this rich description in the admin panel.</p>",
+    "rating": 4.5,
+    "reviews": 10
+  },
+  {
+    "id": "1758984277297",
+    "title": "monkey",
+    "price": 10000,
+    "image": "https://media.discordapp.net/attachments/1402093523007836181/1421508934467846234/IMG_0562_Original.jpg?ex=68d94adc&is=68d7f95c&hm=ae68c1204756383bd4bfe6248ad666a22772b40106e08406d268c22f845c5b76&=&format=webp&width=706&height=967",
+    "href": "/shop/new-1758984277297",
+    "category": "General",
+    "description": "A newly added product with a placeholder description.",
+    "htmlDescription": "<p>Edit this rich description in the admin panel.</p>",
+    "rating": 4.5,
+    "reviews": 10
+  },
+  {
+    "id": "1758984659182",
+    "title": "Product2",
+    "price": 9.99,
+    "image": "/images/key.png",
+    "href": "/shop/new-1758984659182",
+    "category": "General",
+    "description": "A newly added product with a placeholder description.",
+    "htmlDescription": "<p>Edit this rich description in the admin panel.</p>",
+    "rating": 4.5,
+    "reviews": 10
+  },
+  {
+    "id": "1758984795914",
+    "title": "Product3",
+    "price": 15.45,
+    "image": "/images/key.png",
+    "href": "/shop/new-1758984795914",
+    "category": "General",
+    "description": "A newly added product with a placeholder description.",
+    "htmlDescription": "<p>Edit this rich description in the admin panel.</p>",
+    "rating": 4.5,
+    "reviews": 10
+  }
+]

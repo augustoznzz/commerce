@@ -17,9 +17,17 @@ interface ProductCardProps {
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const [stock, setStock] = useState<string | null>(null)
   const [updatedProduct, setUpdatedProduct] = useState<Product>(product)
+  const [isClient, setIsClient] = useState(false)
+
+  // Ensure we're on the client side
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   // Function to update product data from localStorage
   const updateProductData = () => {
+    if (!isClient) return
+    
     try {
       const saved = localStorage.getItem('ct_products')
       if (saved) {
@@ -45,11 +53,15 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
   }
 
   useEffect(() => {
-    updateProductData()
-  }, [product])
+    if (isClient) {
+      updateProductData()
+    }
+  }, [product, isClient])
 
   // Listen for product updates from admin
   useEffect(() => {
+    if (!isClient) return
+
     const handleProductUpdate = () => {
       updateProductData()
     }
@@ -67,7 +79,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       window.removeEventListener('ct_products_updated', handleProductUpdate)
       window.removeEventListener('storage', handleStorageChange)
     }
-  }, [product])
+  }, [product, isClient])
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}

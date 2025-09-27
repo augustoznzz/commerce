@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { clearCartOnSessionEnd, cleanupOldCarts } from '@/lib/cart-utils'
 
 /**
@@ -8,7 +8,16 @@ import { clearCartOnSessionEnd, cleanupOldCarts } from '@/lib/cart-utils'
  * This ensures cart data is properly isolated per user session
  */
 export function SessionManager() {
+  const [isClient, setIsClient] = useState(false)
+
+  // Ensure we're on the client side
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+
     // Clean up any old cart data from previous sessions
     cleanupOldCarts()
 
@@ -35,7 +44,7 @@ export function SessionManager() {
       window.removeEventListener('beforeunload', handleBeforeUnload)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [])
+  }, [isClient])
 
   // This component doesn't render anything
   return null
