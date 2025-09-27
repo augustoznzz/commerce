@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { Users, Award, Heart, Target } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -35,8 +36,14 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="relative">
-            <div className="aspect-square bg-gradient-to-br from-accent/10 to-accent/5 rounded-2xl flex items-center justify-center">
-              <Target className="h-32 w-32 text-accent/30" />
+            <div className="aspect-square bg-gradient-to-br from-accent/10 to-accent/5 rounded-2xl flex items-center justify-center overflow-hidden">
+              <Image
+                src="https://media.discordapp.net/attachments/1402093523007836181/1421510505473900664/IMG_0681.jpg?ex=68d94c52&is=68d7fad2&hm=b1573bfdd6dde7e5e4e0d7ee1d5ded319ec90b447cc5d7eef19cbd59d6fbb32d&=&format=webp&width=706&height=967"
+                alt="CastleTech Mission"
+                fill
+                className="object-cover rounded-2xl"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
             </div>
           </div>
         </div>
